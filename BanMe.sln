@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34511.84
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanMe", "BanMe\BanMe.csproj", "{0B0CBB63-E928-4DFF-AA38-0CE0138589B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BanMe.Client", "BanMe.Client\BanMe.Client.csproj", "{77152E42-C546-428F-AD10-0A8DDC06192B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0B0CBB63-E928-4DFF-AA38-0CE0138589B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B0CBB63-E928-4DFF-AA38-0CE0138589B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B0CBB63-E928-4DFF-AA38-0CE0138589B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B0CBB63-E928-4DFF-AA38-0CE0138589B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77152E42-C546-428F-AD10-0A8DDC06192B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77152E42-C546-428F-AD10-0A8DDC06192B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77152E42-C546-428F-AD10-0A8DDC06192B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77152E42-C546-428F-AD10-0A8DDC06192B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F4658F7-9B4A-4B54-A491-FD41E66A4D20}
+	EndGlobalSection
+EndGlobal

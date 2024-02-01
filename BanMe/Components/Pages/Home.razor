@@ -1,0 +1,67 @@
+﻿@page "/"
+@inject IChampGameStatsService champGameStatsService
+@attribute [StreamRendering(true)]
+
+<PageTitle>BanMe</PageTitle>
+
+<h3>Recommended Bans</h3>
+
+<div class="container">
+	<div class="row row-cols-lg-5">
+		<div class="col">TOP</div>
+		<div class="col">MID</div>
+		<div class="col">JUNGLE</div>
+		<div class="col">BOTTOM</div>
+		<div class="col">SUPP</div>
+	</div>
+</div>
+
+@if (champGameStats == null)
+{
+	<span>Loading...</span>
+}
+else if (champGameStats.Count == 0)
+{
+	<span>No entries.</span>
+}
+else
+{
+	<table class="accordion-body" style="width: 1200px; border-collapse: collapse; border-width: 2px; border-color: #000000;" cellspacing="1" cellpadding="3" align="center" border="1">
+		<thead>
+			<tr style="height: 23px;">
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Champion</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Top</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Mid</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Jungle</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Bot</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Supp</th>
+				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Ban Rate</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			@foreach (var champStat in champGameStats)
+			{
+				<tr>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> @champStat.ChampionName</td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.TopWinRate<br /> PickRate: @champStat.TopPickRate </td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.MidPickRate<br /> PickRate: @champStat.MidPickRate</td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.JunglePickRate<br /> PickRate: @champStat.JunglePickRate</td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.BotPickRate<br /> PickRate: @champStat.BotPickRate</td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.SuppPickRate<br /> PickRate: @champStat.SuppPickRate</td>
+					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> @champStat.BanRate</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@code {
+	List<ChampGameStats> champGameStats = null;
+
+	protected override async Task OnInitializedAsync()
+	{
+		champGameStats = await champGameStatsService.GetAllChampGameStats();
+	}
+}
+
