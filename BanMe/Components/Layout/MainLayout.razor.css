@@ -6,6 +6,10 @@
 
 main {
     flex: 1;
+    background-color: #1a1a20;
+    color: #aaa;
+    font-family: roboto condensed, Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }
 
 .sidebar {

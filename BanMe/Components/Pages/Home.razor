@@ -1,67 +1,91 @@
 ﻿@page "/"
 @inject IChampGameStatsService champGameStatsService
+@inject ILeagueDataService leagueDataService
 @attribute [StreamRendering(true)]
 
 <PageTitle>BanMe</PageTitle>
 
-<h3>Recommended Bans</h3>
+<center><h2>Recommended Bans</h2></center>
+
+<br />
+<br />
 
 <div class="container">
-	<div class="row row-cols-lg-5">
-		<div class="col">TOP</div>
-		<div class="col">MID</div>
-		<div class="col">JUNGLE</div>
-		<div class="col">BOTTOM</div>
-		<div class="col">SUPP</div>
+	<div class="row row-cols-lg-5 gx-4">
+		<div class="col">
+			<center>
+				<h3>Top</h3>
+				@foreach (var entry in topBans)
+				{
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.TopWinRate" PickRate="@entry.TopPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />					
+				}
+			</center>
+		</div>
+		<div class="col">
+			<center>
+				<h3>Mid</h3>
+				@foreach (var entry in midbans)
+				{
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.MidWinRate" PickRate="@entry.MidPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+				}
+			</center>
+		</div>
+		<div class="col">
+			<center>
+				<h3>Jungle</h3>
+				@foreach (var entry in jungleBans)
+				{
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.JungleWinRate" PickRate="@entry.JunglePickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+				}
+			</center>
+		</div>
+		<div class="col">
+			<center>
+				<h3>Bot</h3>
+				@foreach (var entry in botBans)
+				{
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.BotWinRate" PickRate="@entry.BotPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+				}
+			</center>
+		</div>
+		<div class="col">
+			<center>
+				<h3>Supp</h3>
+				@foreach (var entry in suppBans)
+				{
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.SuppWinRate" PickRate="@entry.SuppPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+				}
+			</center>
+		</div>
 	</div>
 </div>
 
-@if (champGameStats == null)
-{
-	<span>Loading...</span>
-}
-else if (champGameStats.Count == 0)
-{
-	<span>No entries.</span>
-}
-else
-{
-	<table class="accordion-body" style="width: 1200px; border-collapse: collapse; border-width: 2px; border-color: #000000;" cellspacing="1" cellpadding="3" align="center" border="1">
-		<thead>
-			<tr style="height: 23px;">
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Champion</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Top</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Mid</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Jungle</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Bot</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Supp</th>
-				<th style="width: 20%; background-color: #d7e4ef; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;" scope="col">Ban Rate</th>
-			</tr>
-		</thead>
-
-		<tbody>
-			@foreach (var champStat in champGameStats)
-			{
-				<tr>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> @champStat.ChampionName</td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.TopWinRate<br /> PickRate: @champStat.TopPickRate </td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.MidPickRate<br /> PickRate: @champStat.MidPickRate</td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.JunglePickRate<br /> PickRate: @champStat.JunglePickRate</td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.BotPickRate<br /> PickRate: @champStat.BotPickRate</td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> WinRate: @champStat.SuppPickRate<br /> PickRate: @champStat.SuppPickRate</td>
-					<td style="width: 20%; text-align: center; border-color: #000000; border-width: 2px; border-style: solid;"> @champStat.BanRate</td>
-				</tr>
-			}
-		</tbody>
-	</table>
-}
-
 @code {
-	List<ChampGameStats> champGameStats = null;
+
+	List<ChampGameStats> champGameStats = new();
+	List<ChampGameStats> topBans = new();
+	List<ChampGameStats> midbans = new();
+	List<ChampGameStats> jungleBans = new();
+	List<ChampGameStats> botBans = new();
+	List<ChampGameStats> suppBans = new();
+
+	private string currentPatch = "";
 
 	protected override async Task OnInitializedAsync()
 	{
 		champGameStats = await champGameStatsService.GetAllChampGameStats();
+		topBans = await champGameStatsService.GetRecommendedBans(Roles.TOP, 16);
+		midbans = await champGameStatsService.GetRecommendedBans(Roles.MIDDLE, 16);
+		jungleBans = await champGameStatsService.GetRecommendedBans(Roles.JUNGLE, 16);
+		botBans = await champGameStatsService.GetRecommendedBans(Roles.BOTTOM, 16);
+		suppBans = await champGameStatsService.GetRecommendedBans(Roles.SUPPORT, 16);
+
+		currentPatch = await leagueDataService.GetLatestPatch();
+	}
+
+	protected string GetChampSquare(string champion)
+	{
+		return $"https://cdn.communitydragon.org/{currentPatch}/champion/{champion}/square";
 	}
 }
 

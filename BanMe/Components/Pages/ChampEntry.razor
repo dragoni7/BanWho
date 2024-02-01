@@ -1,0 +1,39 @@
+﻿
+<div class="billboard">
+	<div class="container">
+
+		<img src=@ImageSource alt="@ChampionName">
+
+		<div class="row">
+			<h5>@ChampionName</h5>
+		</div>
+		<div class="row">
+			<h5>WinRate: <statText>@WinRate.ToString("N2")%</statText></h5>
+		</div>
+		<div class="row">
+			<h5>PickRate: <statText>@PickRate%</statText></h5>
+		</div>
+		<div class="row">
+			<h5>BanRate: <statText>@BanRate%</statText></h5>
+			<hr />
+		</div>
+	</div>
+</div>
+
+
+@code {
+	[Parameter]
+	public string ImageSource { get; set; } = "https://cdn.communitydragon.org/14.2.1/champion/NONE/square";
+
+	[Parameter]
+	public string ChampionName { get; set; } = "Not Found";
+
+	[Parameter]
+	public float WinRate { get; set; } = 0f;
+
+	[Parameter]
+	public float PickRate { get; set; } = 0f;
+
+	[Parameter]
+	public float BanRate { get; set; } = 0f;
+}

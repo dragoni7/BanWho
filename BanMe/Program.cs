@@ -14,6 +14,8 @@ builder.Services.AddDbContext<BanMeContext>(options => options.UseSqlServer(buil
 
 builder.Services.AddScoped<IChampGameStatsService, ChampGameStatsService>();
 
+builder.Services.AddScoped<ILeagueDataService, LeagueDataService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

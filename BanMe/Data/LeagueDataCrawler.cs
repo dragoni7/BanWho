@@ -12,7 +12,7 @@ namespace BanMe.Data
         public LeagueDataCrawler(string apiKey)
         {
             riotApiInstance = RiotGamesApi.NewInstance(apiKey);
-        }
+		}
 
         public async Task<List<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
         {
