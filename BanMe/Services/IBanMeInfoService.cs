@@ -2,6 +2,10 @@
 {
 	public interface IBanMeInfoService
 	{
-		Task<string> GetLatestPatch();
+		Task<string> GetAppVersion();
+
+		Task<string> GetPatch();
+
+		Task<int> GetRecordedGamesCount();
 	}
 }

@@ -80,7 +80,7 @@
 		botBans = await champGameStatsService.GetRecommendedBans(Roles.BOTTOM, 16);
 		suppBans = await champGameStatsService.GetRecommendedBans(Roles.SUPPORT, 16);
 
-		currentPatch = await leagueDataService.GetLatestPatch();
+		currentPatch = await leagueDataService.GetPatch();
 	}
 
 	protected string GetChampSquare(string champion)

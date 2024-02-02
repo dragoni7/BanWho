@@ -1,21 +1,34 @@
 ﻿
+using BanMe.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace BanMe.Services
 {
 	public class BanMeInfoService : IBanMeInfoService
 	{
-		public string CurrentPatch { get; set; }
+		private readonly BanMeContext _context;
 
-		public async Task<string> GetLatestPatch()
+		public BanMeInfoService(BanMeContext context)
 		{
-			string patch = "";
+			_context = context;
+		}
 
-			using (HttpClient client = new HttpClient())
-			{
-				var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
-				patch = json.First();
-			}
+		public async Task<string> GetAppVersion()
+		{
+			var info = await _context.AppInfo.FirstAsync();
+			return info.AppVersion;
+		}
 
-			return patch;
+		public async Task<string> GetPatch()
+		{
+			var info = await _context.AppInfo.FirstAsync();
+			return info.PatchUsed;
+		}
+
+		public async Task<int> GetRecordedGamesCount()
+		{
+			var info = await _context.AppInfo.FirstAsync();
+			return info.RecordedGames;
 		}
 	}
 }

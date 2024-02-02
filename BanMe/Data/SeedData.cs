@@ -7,6 +7,25 @@ namespace BanMe.Data
 {
     public static class SeedData
     {
+        public static async Task UpdateBanMeInfoPatch(IServiceProvider serviceProvider)
+        {
+			string patch = "";
+
+			using (HttpClient client = new HttpClient())
+			{
+				var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
+				patch = json.First();
+			}
+
+			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+
+            if (context.AppInfo.First().PatchUsed != patch)
+            {
+                context.AppInfo.First().PatchUsed = patch;
+
+                context.SaveChanges();
+            }
+		}
 
         public static async Task InitPlayerDb(IServiceProvider serviceProvider)
         {
@@ -43,13 +62,15 @@ namespace BanMe.Data
                 matches.UnionWith(playerMatches);
             }*/
 
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 6; i++)
             {
                 var playerMatches = await dataCrawler.CrawlMatchesAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
                 matches.UnionWith(playerMatches);
             }
 
             int totalGames = matches.Count;
+
+            context.AppInfo.First().RecordedGames = totalGames;
 
             Dictionary<Champion, FlatChampStats> champData = dataCrawler.GatherChampData(dataCrawler.GatherMatchData(matches));
 
