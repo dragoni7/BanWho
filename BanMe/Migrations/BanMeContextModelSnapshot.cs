@@ -71,7 +71,7 @@ namespace BanMe.Migrations
 
                     b.HasKey("PUUID");
 
-                    b.ToTable("PlatPuuids");
+                    b.ToTable("PlayerPuuids");
                 });
 #pragma warning restore 612, 618
         }

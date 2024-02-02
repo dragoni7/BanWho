@@ -2,6 +2,8 @@
 using Camille.Enums;
 using Camille.RiotGames.MatchV5;
 using BanMe.Entities;
+using System.Linq;
+using BanMe.Services;
 
 namespace BanMe.Data
 {
@@ -10,16 +12,21 @@ namespace BanMe.Data
 
         public static async Task InitPlayerDb(IServiceProvider serviceProvider)
         {
-            LeagueDataCrawler dataCrawler = new("RGAPI-503f08cb-9cc4-47a9-8dd6-75ec5ffde053");
+            LeagueDataCrawler dataCrawler = new("RGAPI-0c12efe7-317f-4240-b2f2-87a9cb89736c");
 
-            List<string> players = await dataCrawler.CrawlPlayersAsync(Tier.PLATINUM, PlatformRoute.NA1);
+			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
 
-            using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+			Tier[] tiers = { Tier.EMERALD, Tier.DIAMOND };
 
-            foreach (string puuid in players)
+			foreach (Tier tier in tiers)
             {
-                context.Add(new Player { PUUID = puuid });
-            }
+				var playerPuuids = await dataCrawler.CrawlPlayersAsync(tier, PlatformRoute.NA1);
+
+				foreach (string puuid in playerPuuids)
+				{
+					context.Add(new Player { PUUID = puuid });
+				}
+			}
 
             context.SaveChanges();
         }
@@ -27,21 +34,21 @@ namespace BanMe.Data
 
         public static async Task InitChampGameStatsDb(IServiceProvider serviceProvider)
         {
-            LeagueDataCrawler dataCrawler = new("RGAPI-503f08cb-9cc4-47a9-8dd6-75ec5ffde053");
+            LeagueDataCrawler dataCrawler = new("RGAPI-0c12efe7-317f-4240-b2f2-87a9cb89736c");
 
-            using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
 
             HashSet<Match> matches = new();
 
-            /*foreach (Player player in context.PlatPuuids)
+			/*foreach (Player player in context.PlayerPuuids)
             {
                 var playerMatches = await dataCrawler.CrawlMatchesAsync(player.PUUID, RegionalRoute.AMERICAS);
                 matches.UnionWith(playerMatches);
             }*/
 
-            for (int i = 0; i < 50; i++)
+			for (int i = 0; i < 50; i++)
             {
-                var playerMatches = await dataCrawler.CrawlMatchesAsync(context.PlatPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
+                var playerMatches = await dataCrawler.CrawlMatchesAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
                 matches.UnionWith(playerMatches);
             }
 

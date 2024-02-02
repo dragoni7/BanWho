@@ -33,14 +33,14 @@ namespace BanMe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PlatPuuids",
+                name: "PlayerPuuids",
                 columns: table => new
                 {
                     PUUID = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PlatPuuids", x => x.PUUID);
+                    table.PrimaryKey("PK_PlayerPuuids", x => x.PUUID);
                 });
         }
 
@@ -51,7 +51,7 @@ namespace BanMe.Migrations
                 name: "ChampGameStats");
 
             migrationBuilder.DropTable(
-                name: "PlatPuuids");
+                name: "PlayerPuuids");
         }
     }
 }

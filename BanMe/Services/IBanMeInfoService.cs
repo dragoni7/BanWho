@@ -1,6 +1,6 @@
 ﻿namespace BanMe.Services
 {
-	public interface ILeagueDataService
+	public interface IBanMeInfoService
 	{
 		Task<string> GetLatestPatch();
 	}

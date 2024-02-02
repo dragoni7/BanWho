@@ -11,6 +11,8 @@ namespace BanMe.Data
 
         public DbSet<ChampGameStats> ChampGameStats { get; set; } = default!;
 
-        public DbSet<Player> PlatPuuids { get; set; } = default!;
+        public DbSet<Player> PlayerPuuids { get; set; } = default!;
+
+        public DbSet<BanMeInfo> AppInfo { get; set; } = default!;
     }
 }

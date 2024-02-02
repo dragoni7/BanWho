@@ -1,8 +1,10 @@
 ﻿
 namespace BanMe.Services
 {
-	public class LeagueDataService : ILeagueDataService
+	public class BanMeInfoService : IBanMeInfoService
 	{
+		public string CurrentPatch { get; set; }
+
 		public async Task<string> GetLatestPatch()
 		{
 			string patch = "";
