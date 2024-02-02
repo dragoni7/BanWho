@@ -17,7 +17,7 @@
 				<h3>Top</h3>
 				@foreach (var entry in topBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.TopWinRate" PickRate="@entry.TopPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />					
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.TopWins" PickRate="@entry.TopPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />					
 				}
 			</center>
 		</div>
@@ -26,7 +26,7 @@
 				<h3>Mid</h3>
 				@foreach (var entry in midbans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.MidWinRate" PickRate="@entry.MidPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.MidWins" PickRate="@entry.MidPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -35,7 +35,7 @@
 				<h3>Jungle</h3>
 				@foreach (var entry in jungleBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.JungleWinRate" PickRate="@entry.JunglePickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.JungleWins" PickRate="@entry.JunglePicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -44,7 +44,7 @@
 				<h3>Bot</h3>
 				@foreach (var entry in botBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.BotWinRate" PickRate="@entry.BotPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.BotWins" PickRate="@entry.BotPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -53,7 +53,7 @@
 				<h3>Supp</h3>
 				@foreach (var entry in suppBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.SuppWinRate" PickRate="@entry.SuppPickRate" BanRate="@entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.SuppWins" PickRate="@entry.SuppPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>

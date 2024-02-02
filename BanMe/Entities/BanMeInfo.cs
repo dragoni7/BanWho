@@ -9,7 +9,7 @@ namespace BanMe.Entities
 
 		public required string PatchUsed { get; set; }
 
-		public int RecordedGames { get; set; }
+		public int RecordedGames { get; set; } = 0;
 
 		public string? ApiKey { get; set; }
 	}

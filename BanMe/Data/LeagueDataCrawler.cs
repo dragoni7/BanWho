@@ -18,7 +18,7 @@ namespace BanMe.Data
         {
             HashSet<LeagueEntry> tierEntries = new();
 
-            for (int i = 1; i < 4; i++)
+            for (int i = 1; i < 5; i++)
             {
                 var entries = await riotApiInstance.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
                 tierEntries.UnionWith(entries.Where(e => e.Inactive == false));

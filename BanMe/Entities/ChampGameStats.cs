@@ -7,26 +7,28 @@ namespace BanMe.Entities
         [Key]
         public required string ChampionName { get; set; }
 
-        public float TopWinRate { get; set; }
+        public int TopWins { get; set; } = 0;
 
-        public float TopPickRate { get; set; }
+        public int TopPicks { get; set; } = 0;
 
-        public float MidWinRate { get; set; }
+		public int MidWins { get; set; } = 0;
 
-        public float MidPickRate { get; set; }
+		public int MidPicks { get; set; } = 0;
 
-        public float JungleWinRate { get; set; }
+		public int JungleWins { get; set; } = 0;
 
-        public float JunglePickRate { get; set; }
+		public int JunglePicks { get; set; } = 0;
 
-        public float BotWinRate { get; set; }
+		public int BotWins { get; set; } = 0;
 
-        public float BotPickRate { get; set; }
+		public int BotPicks { get; set; } = 0;
 
-        public float SuppWinRate { get; set; }
+		public int SuppWins { get; set; } = 0;
 
-        public float SuppPickRate { get; set; }
+		public int SuppPicks { get; set; } = 0;
 
-        public float BanRate { get; set; }
+		public int Bans { get; set; } = 0;
+
+		public IList<ChampMatchupStats> MatchupStats { get; set; } = new List<ChampMatchupStats>();
     }
 }

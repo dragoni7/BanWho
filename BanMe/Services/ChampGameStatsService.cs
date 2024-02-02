@@ -27,27 +27,27 @@ namespace BanMe.Services
             {
                 case LeagueConsts.Roles.TOP:
                     {
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.TopPickRate).Take(amount).OrderByDescending(entry => entry.TopWinRate).ToListAsync();
+						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.TopPicks).Take(amount).OrderByDescending(entry => entry.TopWins).ToListAsync();
 						break;
                     }
 				case LeagueConsts.Roles.MIDDLE:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.MidPickRate).Take(amount).OrderByDescending(entry => entry.MidWinRate).ToListAsync();
+						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.MidPicks).Take(amount).OrderByDescending(entry => entry.MidWins).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.JUNGLE:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.JunglePickRate).Take(amount).OrderByDescending(entry => entry.JungleWinRate).ToListAsync();
+						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.JunglePicks).Take(amount).OrderByDescending(entry => entry.JungleWins).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.BOTTOM:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.BotPickRate).Take(amount).OrderByDescending(entry => entry.BotWinRate).ToListAsync();
+						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.BotPicks).Take(amount).OrderByDescending(entry => entry.BotWins).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.SUPPORT:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.SuppPickRate).Take(amount).OrderByDescending(entry => entry.SuppWinRate).ToListAsync();
+						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.SuppPicks).Take(amount).OrderByDescending(entry => entry.SuppWins).ToListAsync();
 						break;
 					}
 			}
