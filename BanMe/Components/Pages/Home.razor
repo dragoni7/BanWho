@@ -1,6 +1,6 @@
 ﻿@page "/"
 @inject IChampGameStatsService champGameStatsService
-@inject IBanMeInfoService leagueDataService
+@inject IBanMeInfoService banMeInfoService
 @attribute [StreamRendering(true)]
 
 <PageTitle>BanMe</PageTitle>
@@ -17,7 +17,7 @@
 				<h3>Top</h3>
 				@foreach (var entry in topBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.TopWins" PickRate="@entry.TopPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />					
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@AsPercentageOf(entry.TopWins, entry.TopPicks)" PickRate="@AsPercentageOf(entry.TopPicks, totalGames)" BanRate="@AsPercentageOf(entry.Bans, totalGames)" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -26,7 +26,7 @@
 				<h3>Mid</h3>
 				@foreach (var entry in midbans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.MidWins" PickRate="@entry.MidPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@AsPercentageOf(entry.MidWins, entry.MidPicks)" PickRate="@AsPercentageOf(entry.MidPicks, totalGames)" BanRate="@AsPercentageOf(entry.Bans, totalGames)" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -35,7 +35,7 @@
 				<h3>Jungle</h3>
 				@foreach (var entry in jungleBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.JungleWins" PickRate="@entry.JunglePicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@AsPercentageOf(entry.JungleWins, entry.JunglePicks)" PickRate="@AsPercentageOf(entry.JunglePicks, totalGames)" BanRate="@AsPercentageOf(entry.Bans, totalGames)" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -44,7 +44,7 @@
 				<h3>Bot</h3>
 				@foreach (var entry in botBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.BotWins" PickRate="@entry.BotPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@AsPercentageOf(entry.BotWins, entry.BotPicks)" PickRate="@AsPercentageOf(entry.BotPicks, totalGames)" BanRate="@AsPercentageOf(entry.Bans, totalGames)" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -53,7 +53,7 @@
 				<h3>Supp</h3>
 				@foreach (var entry in suppBans)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@entry.SuppWins" PickRate="@entry.SuppPicks" BanRate="@entry.Bans" ImageSource=@GetChampSquare(entry.ChampionName) />
+					<ChampEntry ChampionName="@entry.ChampionName" WinRate="@AsPercentageOf(entry.SuppWins, entry.SuppPicks)" PickRate="@AsPercentageOf(entry.SuppPicks, totalGames)" BanRate="@AsPercentageOf(entry.Bans, totalGames)" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
 			</center>
 		</div>
@@ -71,6 +71,8 @@
 
 	private string currentPatch = "";
 
+	private int totalGames = 0;
+
 	protected override async Task OnInitializedAsync()
 	{
 		champGameStats = await champGameStatsService.GetAllChampGameStats();
@@ -80,7 +82,9 @@
 		botBans = await champGameStatsService.GetRecommendedBans(Roles.BOTTOM, 16);
 		suppBans = await champGameStatsService.GetRecommendedBans(Roles.SUPPORT, 16);
 
-		currentPatch = await leagueDataService.GetPatch();
+		currentPatch = await banMeInfoService.GetPatch();
+
+		totalGames = await banMeInfoService.GetRecordedGamesCount();
 	}
 
 	protected string GetChampSquare(string champion)

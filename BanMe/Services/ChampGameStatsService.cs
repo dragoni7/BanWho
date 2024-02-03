@@ -1,6 +1,8 @@
 ﻿using BanMe.Data;
 using BanMe.Entities;
+using BanMe.Util;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace BanMe.Services
 {
@@ -27,27 +29,42 @@ namespace BanMe.Services
             {
                 case LeagueConsts.Roles.TOP:
                     {
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.TopPicks).Take(amount).OrderByDescending(entry => entry.TopWins).ToListAsync();
+						champGameStats = await _context.ChampGameStats
+							.OrderByDescending(entry => entry.TopWins)
+							.ThenByDescending(entry => entry.TopPicks)
+							.Take(amount).ToListAsync();
 						break;
                     }
 				case LeagueConsts.Roles.MIDDLE:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.MidPicks).Take(amount).OrderByDescending(entry => entry.MidWins).ToListAsync();
+						champGameStats = await _context.ChampGameStats
+							.OrderByDescending(entry => entry.MidWins)
+							.ThenByDescending(entry => entry.MidPicks)
+							.Take(amount).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.JUNGLE:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.JunglePicks).Take(amount).OrderByDescending(entry => entry.JungleWins).ToListAsync();
+						champGameStats = await _context.ChampGameStats
+							.OrderByDescending(entry => entry.JungleWins)
+							.ThenByDescending(entry => entry.JunglePicks)
+							.Take(amount).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.BOTTOM:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.BotPicks).Take(amount).OrderByDescending(entry => entry.BotWins).ToListAsync();
+						champGameStats = await _context.ChampGameStats
+							.OrderByDescending(entry => entry.BotWins)
+							.ThenByDescending(entry => entry.BotPicks)
+							.Take(amount).ToListAsync();
 						break;
 					}
 				case LeagueConsts.Roles.SUPPORT:
 					{
-						champGameStats = await _context.ChampGameStats.OrderByDescending(entry => entry.SuppPicks).Take(amount).OrderByDescending(entry => entry.SuppWins).ToListAsync();
+						champGameStats = await _context.ChampGameStats
+							.OrderByDescending(entry => entry.SuppWins)
+							.ThenByDescending(entry => entry.SuppPicks)
+							.Take(amount).ToListAsync();
 						break;
 					}
 			}

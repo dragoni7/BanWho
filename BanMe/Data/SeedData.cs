@@ -29,9 +29,11 @@ namespace BanMe.Data
 
         public static async Task InitPlayerDb(IServiceProvider serviceProvider)
         {
-            LeagueDataCrawler dataCrawler = new("RGAPI-0c12efe7-317f-4240-b2f2-87a9cb89736c");
-
 			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+
+            var appInfo = await context.AppInfo.FirstAsync();
+
+			LeagueDataCrawler dataCrawler = new(appInfo.ApiKey);
 
 			Tier[] selectedTiers = { Tier.EMERALD, Tier.DIAMOND };
 
@@ -50,11 +52,13 @@ namespace BanMe.Data
 
         public static async Task InitChampGameStatsDb(IServiceProvider serviceProvider)
         {
-            LeagueDataCrawler dataCrawler = new("RGAPI-0c12efe7-317f-4240-b2f2-87a9cb89736c");
-
 			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
-            
-            HashSet<Match> matches = new();
+
+			var appInfo = await context.AppInfo.FirstAsync();
+
+			LeagueDataCrawler dataCrawler = new(appInfo.ApiKey);
+
+			HashSet<Match> matches = new();
 
 			/*foreach (Player player in context.PlayerPuuids)
             {
@@ -62,7 +66,7 @@ namespace BanMe.Data
                 matches.UnionWith(playerMatches);
             }*/
 
-			for (int i = 0; i < 6; i++)
+			for (int i = 0; i < 10; i++)
             {
                 var playerMatches = await dataCrawler.CrawlMatchesAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
                 matches.UnionWith(playerMatches);
@@ -133,28 +137,6 @@ namespace BanMe.Data
 					entry.MatchupStats.Add(new ChampMatchupStats() { EnemyChampion = matchup.Key.ToString(), Wins = matchup.Value.Wins, Picks = matchup.Value.Picks });
 				}
             }
-
-            /*entry.TopWins = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.TOP].Wins, stats.RoleStats[LeagueConsts.Roles.TOP].Picks);
-            entry.TopPicks = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.TOP].Picks, totalGames);
-            entry.MidWins = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.MIDDLE].Wins, stats.RoleStats[LeagueConsts.Roles.MIDDLE].Picks);
-            entry.MidPicks = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.MIDDLE].Picks, totalGames);
-            entry.JungleWins = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.JUNGLE].Wins, stats.RoleStats[LeagueConsts.Roles.JUNGLE].Picks);
-            entry.JunglePicks = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.JUNGLE].Picks, totalGames);
-            entry.BotWins = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.BOTTOM].Wins, stats.RoleStats[LeagueConsts.Roles.BOTTOM].Picks);
-            entry.BotPicks = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.BOTTOM].Picks, totalGames);
-            entry.SuppWins = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.SUPPORT].Wins, stats.RoleStats[LeagueConsts.Roles.SUPPORT].Picks);
-            entry.SuppPicks = CalcPercentageOf(stats.RoleStats[LeagueConsts.Roles.SUPPORT].Picks, totalGames);
-            entry.Bans = CalcPercentageOf(stats.Bans, totalGames);*/
-        }
-
-        private static float CalcPercentageOf(float n1, float n2)
-        {
-            if (n2 == 0)
-            {
-                return 0f;
-            }
-
-            return n1 * 100 / n2;
         }
     }
 }
