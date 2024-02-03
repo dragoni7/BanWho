@@ -58,26 +58,56 @@ namespace BanMe.Data
 
 			LeagueDataCrawler dataCrawler = new(appInfo.ApiKey);
 
-			HashSet<Match> matches = new();
-
 			/*foreach (Player player in context.PlayerPuuids)
             {
                 var playerMatches = await dataCrawler.CrawlMatchesAsync(player.PUUID, RegionalRoute.AMERICAS);
                 matches.UnionWith(playerMatches);
             }*/
 
+
+			// gather match ids from players
+
+			HashSet<string> matchIDsToProcess = new();
+
 			for (int i = 0; i < 10; i++)
             {
-                var playerMatches = await dataCrawler.CrawlMatchesAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
-                matches.UnionWith(playerMatches);
+                var playerMatchIDs = await dataCrawler.GatherMatchIDsAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
+				matchIDsToProcess.UnionWith(playerMatchIDs);
             }
 
-            int totalGames = matches.Count;
+            // remove matches already processed
+            System.Diagnostics.Debug.WriteLine("Removed " + matchIDsToProcess.RemoveWhere(id => context.ProcessedMatches.Any(i => i.MatchID == id)) + " match ids from query.");
+            System.Diagnostics.Debug.WriteLine("Found " + matchIDsToProcess.Count() + " new matches");
 
-            context.AppInfo.First().RecordedGames = totalGames;
+            // return if no new matches to process
+            if (matchIDsToProcess.Count() == 0)
+            {
+                return;
+            }
 
-            Dictionary<Champion, FlatChampStats> champData = dataCrawler.GatherChampData(dataCrawler.GatherMatchData(matches));
+			// add new matches to processed matches
+			foreach (string matchID in matchIDsToProcess)
+            {
+                context.ProcessedMatches.Add(new ProcessedMatch() { MatchID = matchID });
+            }
 
+            // remove oldest processed match entries
+            if (context.ProcessedMatches.Count() > context.PlayerPuuids.Count() * 20)
+            {
+                int toRemove = context.ProcessedMatches.Count() - context.PlayerPuuids.Count() * 20;
+				context.ProcessedMatches.RemoveRange(context.ProcessedMatches.TakeLast(toRemove));
+			}
+
+            // update recorded games
+            context.AppInfo.First().RecordedGames += context.ProcessedMatches.Count();
+
+            // get new matches
+			HashSet<Match> matches = await dataCrawler.CrawlMatchesAsync(matchIDsToProcess, RegionalRoute.AMERICAS);
+
+            // get champ stats from matches
+			Dictionary<Champion, FlatChampStats> champData = dataCrawler.GatherChampData(dataCrawler.GatherMatchData(matches));
+
+            // update or add champ data entries
             foreach (var data in champData)
             {
                 try
@@ -91,13 +121,13 @@ namespace BanMe.Data
                             ChampionName = data.Key.ToString()
                         };
 
-						UpdateChampGameStats(newEntry, data.Value, totalGames);
+						UpdateChampGameStats(newEntry, data.Value);
 
 						context.ChampGameStats.Add(newEntry);
 					}
                     else
                     {
-						UpdateChampGameStats(entry, data.Value, totalGames);
+						UpdateChampGameStats(entry, data.Value);
 					}
                 }
                 catch (Exception ex)
@@ -108,7 +138,7 @@ namespace BanMe.Data
             }
         }
 
-        private static void UpdateChampGameStats(ChampGameStats entry, FlatChampStats stats, int totalGames)
+        private static void UpdateChampGameStats(ChampGameStats entry, FlatChampStats stats)
         {
             entry.TopWins += stats.RoleStats[LeagueConsts.Roles.TOP].Wins;
             entry.TopPicks += stats.RoleStats[LeagueConsts.Roles.TOP].Picks;

@@ -1,5 +1,4 @@
-﻿
-using BanMe.Data;
+﻿using BanMe.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Services

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanMe.Migrations
 {
     [DbContext(typeof(BanMeContext))]
-    [Migration("20240202214101_InitialCreate")]
+    [Migration("20240203013210_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -123,6 +123,16 @@ namespace BanMe.Migrations
                     b.HasKey("PUUID");
 
                     b.ToTable("PlayerPuuids");
+                });
+
+            modelBuilder.Entity("BanMe.Entities.ProcessedMatch", b =>
+                {
+                    b.Property<string>("MatchID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("MatchID");
+
+                    b.ToTable("ProcessedMatches");
                 });
 
             modelBuilder.Entity("BanMe.Entities.ChampMatchupStats", b =>

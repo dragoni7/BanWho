@@ -23,7 +23,7 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
     //await SeedData.InitPlayerDb(services);
     //await SeedData.UpdateBanMeInfoPatch(services);
-	//await SeedData.InitChampGameStatsDb(services);
+	await SeedData.InitChampGameStatsDb(services);
 }
 
 // Configure the HTTP request pipeline.

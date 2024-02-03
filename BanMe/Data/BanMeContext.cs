@@ -13,6 +13,8 @@ namespace BanMe.Data
 
         public DbSet<Player> PlayerPuuids { get; set; } = default!;
 
+        public DbSet<ProcessedMatch> ProcessedMatches { get; set; } = default!;
+
         public DbSet<BanMeInfo> AppInfo { get; set; } = default!;
     }
 }

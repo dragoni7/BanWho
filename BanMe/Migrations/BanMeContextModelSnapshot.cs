@@ -122,6 +122,16 @@ namespace BanMe.Migrations
                     b.ToTable("PlayerPuuids");
                 });
 
+            modelBuilder.Entity("BanMe.Entities.ProcessedMatch", b =>
+                {
+                    b.Property<string>("MatchID")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("MatchID");
+
+                    b.ToTable("ProcessedMatches");
+                });
+
             modelBuilder.Entity("BanMe.Entities.ChampMatchupStats", b =>
                 {
                     b.HasOne("BanMe.Entities.ChampGameStats", null)

@@ -2,6 +2,8 @@
 using Camille.RiotGames;
 using Camille.RiotGames.LeagueV4;
 using Camille.RiotGames.MatchV5;
+using System;
+using System.Collections.Generic;
 
 namespace BanMe.Data
 {
@@ -35,13 +37,16 @@ namespace BanMe.Data
             return puuids;
         }
 
-        public async Task<HashSet<Match>> CrawlMatchesAsync(string puuid, RegionalRoute region)
+        public async Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region)
+		{
+            return await riotApiInstance.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
+		}
+
+        public async Task<HashSet<Match>> CrawlMatchesAsync(HashSet<string> matchIDs, RegionalRoute region)
         {
             HashSet<Match> matchSet = new();
 
-            string[] matches = await riotApiInstance.MatchV5().GetMatchIdsByPUUIDAsync(region, puuid);
-
-            foreach (string id in matches)
+            foreach (string id in matchIDs)
             {
                 Match match = await riotApiInstance.MatchV5().GetMatchAsync(region, id);
                 matchSet.Add(match);

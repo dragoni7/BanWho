@@ -10,7 +10,7 @@ namespace BanMe.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
+            /*migrationBuilder.CreateTable(
                 name: "AppInfo",
                 columns: table => new
                 {
@@ -22,7 +22,7 @@ namespace BanMe.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppInfo", x => x.AppVersion);
-                });
+                });*/
 
             migrationBuilder.CreateTable(
                 name: "ChampGameStats",
@@ -45,7 +45,7 @@ namespace BanMe.Migrations
                 {
                     table.PrimaryKey("PK_ChampGameStats", x => x.ChampionName);
                 });
-            
+            /*
             migrationBuilder.CreateTable(
                 name: "PlayerPuuids",
                 columns: table => new
@@ -55,6 +55,17 @@ namespace BanMe.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PlayerPuuids", x => x.PUUID);
+                });*/
+
+            migrationBuilder.CreateTable(
+                name: "ProcessedMatches",
+                columns: table => new
+                {
+                    MatchID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProcessedMatches", x => x.MatchID);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,6 +106,9 @@ namespace BanMe.Migrations
 
             migrationBuilder.DropTable(
                 name: "PlayerPuuids");
+
+            migrationBuilder.DropTable(
+                name: "ProcessedMatches");
 
             migrationBuilder.DropTable(
                 name: "ChampGameStats");
