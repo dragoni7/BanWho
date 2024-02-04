@@ -21,5 +21,12 @@ namespace BanMe.Data
         {
 			return await AppInfo.FirstAsync();
         }
+
+        public async Task DumpPatchDataAsync()
+        {
+            await Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE [ChampMatchupStats]");
+			await Database.ExecuteSqlRawAsync("SET FOREIGN_KEY_CHECKS = 0; TRUNCATE TABLE [ChampGameStats]");
+			await Database.ExecuteSqlRawAsync("TRUNCATE TABLE [PlayerPuuids]");
+		}
 	}
 }

@@ -11,7 +11,7 @@ namespace BanMe.Handlers
 		{
 			using var scope = request.ServiceProvider.CreateScope();
 
-			var banMecontext = scope.ServiceProvider.GetRequiredService<BanMeDbContext>();
+			var dbContext = scope.ServiceProvider.GetRequiredService<BanMeDbContext>();
 			var logger = scope.ServiceProvider.GetRequiredService<ILogger<PatchUpdateBackgroundJob>>();
 
 			string fetchedPatch = "";
@@ -22,16 +22,18 @@ namespace BanMe.Handlers
 				fetchedPatch = json.First();
 			}
 
-			var appInfo = await banMecontext.GetBanMeInfoAsync();
+			var appInfo = await dbContext.GetBanMeInfoAsync();
 
 			if (appInfo.PatchUsed != fetchedPatch)
 			{
 				logger.LogInformation($"Updated db from old patch {appInfo.PatchUsed} to {fetchedPatch}");
 				appInfo.PatchUsed = fetchedPatch;
 
-				// clear dbs for new patch
+				await dbContext.DumpPatchDataAsync();
 
-				banMecontext.SaveChanges();
+				// re-seed db
+
+				dbContext.SaveChanges();
 			}
 
 
