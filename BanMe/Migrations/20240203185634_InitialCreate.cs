@@ -30,16 +30,27 @@ namespace BanMe.Migrations
                 {
                     ChampionName = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TopWins = table.Column<int>(type: "int", nullable: false),
+                    TopWinRate = table.Column<float>(type: "real", nullable: false),
                     TopPicks = table.Column<int>(type: "int", nullable: false),
+                    TopPickRate = table.Column<float>(type: "real", nullable: false),
                     MidWins = table.Column<int>(type: "int", nullable: false),
+                    MidWinRate = table.Column<float>(type: "real", nullable: false),
                     MidPicks = table.Column<int>(type: "int", nullable: false),
+                    MidPickRate = table.Column<float>(type: "real", nullable: false),
                     JungleWins = table.Column<int>(type: "int", nullable: false),
+                    JungleWinRate = table.Column<float>(type: "real", nullable: false),
                     JunglePicks = table.Column<int>(type: "int", nullable: false),
+                    JunglePickRate = table.Column<float>(type: "real", nullable: false),
                     BotWins = table.Column<int>(type: "int", nullable: false),
+                    BotWinRate = table.Column<float>(type: "real", nullable: false),
                     BotPicks = table.Column<int>(type: "int", nullable: false),
+                    BotPickRate = table.Column<float>(type: "real", nullable: false),
                     SuppWins = table.Column<int>(type: "int", nullable: false),
+                    SuppWinRate = table.Column<float>(type: "real", nullable: false),
                     SuppPicks = table.Column<int>(type: "int", nullable: false),
-                    Bans = table.Column<int>(type: "int", nullable: false)
+                    SuppPickRate = table.Column<float>(type: "real", nullable: false),
+                    Bans = table.Column<int>(type: "int", nullable: false),
+                    BanRate = table.Column<float>(type: "real", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,6 +87,7 @@ namespace BanMe.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EnemyChampion = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Wins = table.Column<int>(type: "int", nullable: false),
+                    WinRate = table.Column<float>(type: "real", nullable: false),
                     Picks = table.Column<int>(type: "int", nullable: false),
                     ChampGameStatsChampionName = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },

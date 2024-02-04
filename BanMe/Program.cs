@@ -1,7 +1,9 @@
 using BanMe.Components;
 using BanMe.Data;
+using BanMe.Jobs;
 using BanMe.Services;
 using Microsoft.EntityFrameworkCore;
+using Quartz;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,26 @@ builder.Services.AddScoped<IChampGameStatsService, ChampGameStatsService>();
 
 builder.Services.AddScoped<IBanMeInfoService, BanMeInfoService>();
 
+builder.Services.AddQuartz(options =>
+{
+    options.UseMicrosoftDependencyInjectionJobFactory();
+
+
+    var jobKey = JobKey.Create(nameof(PatchUpdateBackgroundJob));
+    
+    options
+        .AddJob<PatchUpdateBackgroundJob>(jobKey)
+        .AddTrigger(trigger =>
+            trigger
+                .ForJob(jobKey)
+                .WithSimpleSchedule(schedule =>
+                schedule.WithIntervalInSeconds(10)
+                .RepeatForever())
+                );
+});
+
+builder.Services.AddQuartzHostedService();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -23,7 +45,7 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
     //await SeedData.InitPlayerDb(services);
     //await SeedData.UpdateBanMeInfoPatch(services);
-	await SeedData.InitChampGameStatsDb(services);
+	//await SeedData.InitChampGameStatsDb(services);
 }
 
 // Configure the HTTP request pipeline.

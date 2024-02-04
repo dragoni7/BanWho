@@ -11,6 +11,8 @@ namespace BanMe.Entities
 
 		public int Wins { get; set; } = 0;
 
+		public float WinRate { get; set; } = 0f;
+
 		public int Picks { get; set; } = 0;
 	}
 }

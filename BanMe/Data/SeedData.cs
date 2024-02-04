@@ -2,6 +2,7 @@
 using Camille.Enums;
 using Camille.RiotGames.MatchV5;
 using BanMe.Entities;
+using BanMe.Util;
 
 namespace BanMe.Data
 {
@@ -69,14 +70,14 @@ namespace BanMe.Data
 
 			HashSet<string> matchIDsToProcess = new();
 
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < 200; i++)
             {
                 var playerMatchIDs = await dataCrawler.GatherMatchIDsAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
 				matchIDsToProcess.UnionWith(playerMatchIDs);
             }
 
-            // remove matches already processed
-            System.Diagnostics.Debug.WriteLine("Removed " + matchIDsToProcess.RemoveWhere(id => context.ProcessedMatches.Any(i => i.MatchID == id)) + " match ids from query.");
+			// remove matches already processed
+			System.Diagnostics.Debug.WriteLine("Removed " + matchIDsToProcess.RemoveWhere(id => context.ProcessedMatches.Any(i => i.MatchID == id)) + " match ids from query.");
             System.Diagnostics.Debug.WriteLine("Found " + matchIDsToProcess.Count() + " new matches");
 
             // return if no new matches to process
@@ -91,15 +92,15 @@ namespace BanMe.Data
                 context.ProcessedMatches.Add(new ProcessedMatch() { MatchID = matchID });
             }
 
-            // remove oldest processed match entries
-            if (context.ProcessedMatches.Count() > context.PlayerPuuids.Count() * 20)
+			// remove oldest processed match entries
+			if (context.ProcessedMatches.Count() > context.PlayerPuuids.Count() * 20)
             {
                 int toRemove = context.ProcessedMatches.Count() - context.PlayerPuuids.Count() * 20;
 				context.ProcessedMatches.RemoveRange(context.ProcessedMatches.TakeLast(toRemove));
 			}
 
             // update recorded games
-            context.AppInfo.First().RecordedGames += context.ProcessedMatches.Count();
+            appInfo.RecordedGames += matchIDsToProcess.Count();
 
             // get new matches
 			HashSet<Match> matches = await dataCrawler.CrawlMatchesAsync(matchIDsToProcess, RegionalRoute.AMERICAS);
@@ -121,13 +122,13 @@ namespace BanMe.Data
                             ChampionName = data.Key.ToString()
                         };
 
-						UpdateChampGameStats(newEntry, data.Value);
+						UpdateChampGameStats(newEntry, data.Value, appInfo.RecordedGames);
 
 						context.ChampGameStats.Add(newEntry);
 					}
                     else
                     {
-						UpdateChampGameStats(entry, data.Value);
+						UpdateChampGameStats(entry, data.Value, appInfo.RecordedGames);
 					}
                 }
                 catch (Exception ex)
@@ -138,7 +139,7 @@ namespace BanMe.Data
             }
         }
 
-        private static void UpdateChampGameStats(ChampGameStats entry, FlatChampStats stats)
+        private static void UpdateChampGameStats(ChampGameStats entry, FlatChampStats stats, int recordedGames)
         {
             entry.TopWins += stats.RoleStats[LeagueConsts.Roles.TOP].Wins;
             entry.TopPicks += stats.RoleStats[LeagueConsts.Roles.TOP].Picks;
@@ -152,7 +153,24 @@ namespace BanMe.Data
             entry.SuppPicks += stats.RoleStats[LeagueConsts.Roles.SUPPORT].Picks;
             entry.Bans += stats.Bans;
 
-            foreach (var matchup in stats.MatchUps)
+            entry.TopWinRate = MathUtil.AsPercentageOf(entry.TopWins, entry.TopPicks);
+            entry.TopPickRate = MathUtil.AsPercentageOf(entry.TopPicks, recordedGames);
+
+			entry.MidWinRate = MathUtil.AsPercentageOf(entry.MidWins, entry.MidPicks);
+			entry.MidPickRate = MathUtil.AsPercentageOf(entry.MidPicks, recordedGames);
+
+			entry.JungleWinRate = MathUtil.AsPercentageOf(entry.JungleWins, entry.JunglePicks);
+			entry.JunglePickRate = MathUtil.AsPercentageOf(entry.JunglePicks, recordedGames);
+
+			entry.BotWinRate = MathUtil.AsPercentageOf(entry.BotWins, entry.BotPicks);
+			entry.BotPickRate = MathUtil.AsPercentageOf(entry.BotPicks, recordedGames);
+
+			entry.SuppWinRate = MathUtil.AsPercentageOf(entry.SuppWins, entry.SuppPicks);
+			entry.SuppPickRate = MathUtil.AsPercentageOf(entry.SuppPicks, recordedGames);
+
+            entry.BanRate = MathUtil.AsPercentageOf(entry.Bans, recordedGames);
+
+			foreach (var matchup in stats.MatchUps)
             {
                 var m = entry.MatchupStats.FirstOrDefault(m => m.EnemyChampion == matchup.Key.ToString());
 
@@ -164,7 +182,13 @@ namespace BanMe.Data
 				}
                 else
                 {
-					entry.MatchupStats.Add(new ChampMatchupStats() { EnemyChampion = matchup.Key.ToString(), Wins = matchup.Value.Wins, Picks = matchup.Value.Picks });
+					entry.MatchupStats.Add(new ChampMatchupStats()
+                    { 
+                        EnemyChampion = matchup.Key.ToString(),
+                        Wins = matchup.Value.Wins,
+                        Picks = matchup.Value.Picks,
+                        WinRate = MathUtil.AsPercentageOf(matchup.Value.Wins, matchup.Value.Picks)
+                    });
 				}
             }
         }

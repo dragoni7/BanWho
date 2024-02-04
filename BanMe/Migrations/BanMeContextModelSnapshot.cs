@@ -46,35 +46,68 @@ namespace BanMe.Migrations
                     b.Property<string>("ChampionName")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<float>("BanRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("Bans")
                         .HasColumnType("int");
+
+                    b.Property<float>("BotPickRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("BotPicks")
                         .HasColumnType("int");
 
+                    b.Property<float>("BotWinRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("BotWins")
                         .HasColumnType("int");
+
+                    b.Property<float>("JunglePickRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("JunglePicks")
                         .HasColumnType("int");
 
+                    b.Property<float>("JungleWinRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("JungleWins")
                         .HasColumnType("int");
+
+                    b.Property<float>("MidPickRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("MidPicks")
                         .HasColumnType("int");
 
+                    b.Property<float>("MidWinRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("MidWins")
                         .HasColumnType("int");
+
+                    b.Property<float>("SuppPickRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("SuppPicks")
                         .HasColumnType("int");
 
+                    b.Property<float>("SuppWinRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("SuppWins")
                         .HasColumnType("int");
 
+                    b.Property<float>("TopPickRate")
+                        .HasColumnType("real");
+
                     b.Property<int>("TopPicks")
                         .HasColumnType("int");
+
+                    b.Property<float>("TopWinRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("TopWins")
                         .HasColumnType("int");
@@ -101,6 +134,9 @@ namespace BanMe.Migrations
 
                     b.Property<int>("Picks")
                         .HasColumnType("int");
+
+                    b.Property<float>("WinRate")
+                        .HasColumnType("real");
 
                     b.Property<int>("Wins")
                         .HasColumnType("int");

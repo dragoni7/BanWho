@@ -1,4 +1,5 @@
 ﻿using BanMe.Entities;
+using BanMe.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Data
@@ -16,5 +17,5 @@ namespace BanMe.Data
         public DbSet<ProcessedMatch> ProcessedMatches { get; set; } = default!;
 
         public DbSet<BanMeInfo> AppInfo { get; set; } = default!;
-    }
+	}
 }
