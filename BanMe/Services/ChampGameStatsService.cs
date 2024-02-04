@@ -7,9 +7,9 @@ namespace BanMe.Services
 {
     public class ChampGameStatsService : IChampGameStatsService
     {
-        private readonly BanMeContext _context;
+        private readonly BanMeDbContext _context;
 
-        public ChampGameStatsService(BanMeContext context)
+        public ChampGameStatsService(BanMeDbContext context)
         {
             _context = context;
         }

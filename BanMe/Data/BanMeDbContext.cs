@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Data
 {
-    public class BanMeContext : DbContext
+    public class BanMeDbContext : DbContext
     {
-        public BanMeContext(DbContextOptions<BanMeContext> options) : base(options)
+        public BanMeDbContext(DbContextOptions<BanMeDbContext> options) : base(options)
         {
         }
 

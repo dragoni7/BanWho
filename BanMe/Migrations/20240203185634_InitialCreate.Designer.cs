@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BanMe.Migrations
 {
-    [DbContext(typeof(BanMeContext))]
+    [DbContext(typeof(BanMeDbContext))]
     [Migration("20240203185634_InitialCreate")]
     partial class InitialCreate
     {

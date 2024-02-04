@@ -1,9 +1,11 @@
 using BanMe.Components;
 using BanMe.Data;
-using BanMe.Jobs;
 using BanMe.Services;
 using Microsoft.EntityFrameworkCore;
+using BanMeInfrastructure;
 using Quartz;
+using Camille.RiotGames.LolStatusV3;
+using BanMe.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,31 +14,14 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddDbContext<BanMeContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<BanMeDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IChampGameStatsService, ChampGameStatsService>();
 
 builder.Services.AddScoped<IBanMeInfoService, BanMeInfoService>();
 
-builder.Services.AddQuartz(options =>
-{
-    options.UseMicrosoftDependencyInjectionJobFactory();
-
-
-    var jobKey = JobKey.Create(nameof(PatchUpdateBackgroundJob));
-    
-    options
-        .AddJob<PatchUpdateBackgroundJob>(jobKey)
-        .AddTrigger(trigger =>
-            trigger
-                .ForJob(jobKey)
-                .WithSimpleSchedule(schedule =>
-                schedule.WithIntervalInSeconds(10)
-                .RepeatForever())
-                );
-});
-
-builder.Services.AddQuartzHostedService();
+builder.Services.AddInfrastructure();
+builder.Services.AddMediatRType<PatchUpdatedHandler>();
 
 var app = builder.Build();
 

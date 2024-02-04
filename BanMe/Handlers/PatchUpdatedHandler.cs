@@ -1,23 +1,18 @@
 ﻿using BanMe.Data;
+using BanMeInfrastructure.Jobs;
+using BanMeInfrastructure.Messages;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Quartz;
 
-namespace BanMe.Jobs
+namespace BanMe.Handlers
 {
-	[DisallowConcurrentExecution]
-	public class PatchUpdateBackgroundJob : IJob
+	public class PatchUpdatedHandler : IRequestHandler<PatchUpdateMessage>
 	{
-		private readonly IServiceProvider _serviceProvider;
-
-		public PatchUpdateBackgroundJob(IServiceProvider serviceProvider)
+		public async Task Handle(PatchUpdateMessage request, CancellationToken cancellationToken)
 		{
-			_serviceProvider = serviceProvider;
-		}
+			using var scope = request.ServiceProvider.CreateScope();
 
-		public async Task Execute(IJobExecutionContext context)
-		{
-			using var scope = _serviceProvider.CreateScope();
-			var banMecontext = scope.ServiceProvider.GetRequiredService<BanMeContext>();
+			var banMecontext = scope.ServiceProvider.GetRequiredService<BanMeDbContext>();
 			var logger = scope.ServiceProvider.GetRequiredService<ILogger<PatchUpdateBackgroundJob>>();
 
 			string fetchedPatch = "";

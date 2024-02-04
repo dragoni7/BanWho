@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BanMe.Client\BanMe.Client.csproj" />
+    <ProjectReference Include="..\BanMeInfrastructure\BanMeInfrastructure.csproj" />
     <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2024-01-20-deb32a8340" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
@@ -16,7 +17,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
-    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>

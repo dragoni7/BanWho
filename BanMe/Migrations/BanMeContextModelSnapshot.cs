@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace BanMe.Migrations
 {
-    [DbContext(typeof(BanMeContext))]
+    [DbContext(typeof(BanMeDbContext))]
     partial class BanMeContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

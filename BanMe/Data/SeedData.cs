@@ -18,7 +18,7 @@ namespace BanMe.Data
 				patch = json.First();
 			}
 
-			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
 
             if (context.AppInfo.First().PatchUsed != patch)
             {
@@ -30,7 +30,7 @@ namespace BanMe.Data
 
         public static async Task InitPlayerDb(IServiceProvider serviceProvider)
         {
-			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
 
             var appInfo = await context.AppInfo.FirstAsync();
 
@@ -53,7 +53,7 @@ namespace BanMe.Data
 
         public static async Task InitChampGameStatsDb(IServiceProvider serviceProvider)
         {
-			using var context = new BanMeContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeContext>>());
+			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
 
 			var appInfo = await context.AppInfo.FirstAsync();
 

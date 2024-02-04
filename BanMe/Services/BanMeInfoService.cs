@@ -5,9 +5,9 @@ namespace BanMe.Services
 {
 	public class BanMeInfoService : IBanMeInfoService
 	{
-		private readonly BanMeContext _context;
+		private readonly BanMeDbContext _context;
 
-		public BanMeInfoService(BanMeContext context)
+		public BanMeInfoService(BanMeDbContext context)
 		{
 			_context = context;
 		}
