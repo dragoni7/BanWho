@@ -1,5 +1,4 @@
 ﻿using BanMe.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Services
 {
@@ -14,19 +13,19 @@ namespace BanMe.Services
 
 		public async Task<string> GetAppVersion()
 		{
-			var info = await _context.AppInfo.FirstAsync();
+			var info = await _context.GetBanMeInfoAsync();
 			return info.AppVersion;
 		}
 
 		public async Task<string> GetPatch()
 		{
-			var info = await _context.AppInfo.FirstAsync();
+			var info = await _context.GetBanMeInfoAsync();
 			return info.PatchUsed;
 		}
 
 		public async Task<int> GetRecordedGamesCount()
 		{
-			var info = await _context.AppInfo.FirstAsync();
+			var info = await _context.GetBanMeInfoAsync();
 			return info.RecordedGames;
 		}
 	}

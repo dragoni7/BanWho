@@ -2,7 +2,6 @@
 using Quartz;
 using MediatR;
 using BanMeInfrastructure.Messages;
-using System;
 
 namespace BanMeInfrastructure.Jobs
 {

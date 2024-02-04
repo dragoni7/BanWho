@@ -1,19 +1,19 @@
-﻿using Camille.Enums;
+﻿using BanMe.Data;
+using Camille.Enums;
 using Camille.RiotGames;
 using Camille.RiotGames.LeagueV4;
 using Camille.RiotGames.MatchV5;
-using System;
-using System.Collections.Generic;
 
-namespace BanMe.Data
+namespace BanMe.Services
 {
-	public class LeagueDataCrawler
+    public class LeagueDataCrawler : ILeagueDataCrawler
     {
-        private readonly RiotGamesApi riotApiInstance;
+        private readonly RiotGamesApi _riotApiInstance;
 
-        public LeagueDataCrawler(string apiKey)
+		public LeagueDataCrawler(IServiceProvider serviceProvider)
         {
-            riotApiInstance = RiotGamesApi.NewInstance(apiKey);
+            using var scope = serviceProvider.CreateScope();
+			_riotApiInstance = RiotGamesApi.NewInstance(scope.ServiceProvider.GetRequiredService<BanMeDbContext>().AppInfo.First().ApiKey);
 		}
 
         public async Task<List<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
@@ -22,15 +22,15 @@ namespace BanMe.Data
 
             for (int i = 1; i < 5; i++)
             {
-                var entries = await riotApiInstance.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
+                var entries = await _riotApiInstance.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
                 tierEntries.UnionWith(entries.Where(e => e.Inactive == false));
-			}
+            }
 
             List<string> puuids = new();
 
             foreach (LeagueEntry entry in tierEntries)
             {
-                var summoner = await riotApiInstance.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
+                var summoner = await _riotApiInstance.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
                 puuids.Add(summoner.Puuid);
             }
 
@@ -38,9 +38,9 @@ namespace BanMe.Data
         }
 
         public async Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region)
-		{
-            return await riotApiInstance.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
-		}
+        {
+            return await _riotApiInstance.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
+        }
 
         public async Task<HashSet<Match>> CrawlMatchesAsync(HashSet<string> matchIDs, RegionalRoute region)
         {
@@ -48,7 +48,7 @@ namespace BanMe.Data
 
             foreach (string id in matchIDs)
             {
-                Match match = await riotApiInstance.MatchV5().GetMatchAsync(region, id);
+                Match match = await _riotApiInstance.MatchV5().GetMatchAsync(region, id);
                 matchSet.Add(match);
             }
 

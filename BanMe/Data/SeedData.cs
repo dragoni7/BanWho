@@ -3,38 +3,20 @@ using Camille.Enums;
 using Camille.RiotGames.MatchV5;
 using BanMe.Entities;
 using BanMe.Util;
+using BanMe.Services;
 
 namespace BanMe.Data
 {
     public static class SeedData
     {
-        public static async Task UpdateBanMeInfoPatch(IServiceProvider serviceProvider)
-        {
-			string patch = "";
-
-			using (HttpClient client = new HttpClient())
-			{
-				var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
-				patch = json.First();
-			}
-
-			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
-
-            if (context.AppInfo.First().PatchUsed != patch)
-            {
-                context.AppInfo.First().PatchUsed = patch;
-
-                context.SaveChanges();
-            }
-		}
 
         public static async Task InitPlayerDb(IServiceProvider serviceProvider)
         {
-			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
+			using var dbContext = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
 
-            var appInfo = await context.AppInfo.FirstAsync();
+            var appInfo = await dbContext.GetBanMeInfoAsync();
 
-			LeagueDataCrawler dataCrawler = new(appInfo.ApiKey);
+            var dataCrawler = serviceProvider.GetRequiredService<ILeagueDataCrawler>();
 
 			Tier[] selectedTiers = { Tier.EMERALD, Tier.DIAMOND };
 
@@ -44,20 +26,20 @@ namespace BanMe.Data
 
 				foreach (string puuid in playerPuuids)
 				{
-					context.Add(new Player { PUUID = puuid });
+					dbContext.Add(new Player { PUUID = puuid });
 				}
 			}
 
-            context.SaveChanges();
+            dbContext.SaveChanges();
         }
 
         public static async Task InitChampGameStatsDb(IServiceProvider serviceProvider)
         {
-			using var context = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
+			using var dbContext = new BanMeDbContext(serviceProvider.GetRequiredService<DbContextOptions<BanMeDbContext>>());
 
-			var appInfo = await context.AppInfo.FirstAsync();
+			var appInfo = await dbContext.GetBanMeInfoAsync();
 
-			LeagueDataCrawler dataCrawler = new(appInfo.ApiKey);
+			var dataCrawler = serviceProvider.GetRequiredService<ILeagueDataCrawler>();
 
 			/*foreach (Player player in context.PlayerPuuids)
             {
@@ -70,14 +52,14 @@ namespace BanMe.Data
 
 			HashSet<string> matchIDsToProcess = new();
 
-			for (int i = 0; i < 200; i++)
+			for (int i = 0; i < 40; i++)
             {
-                var playerMatchIDs = await dataCrawler.GatherMatchIDsAsync(context.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
+                var playerMatchIDs = await dataCrawler.GatherMatchIDsAsync(dbContext.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
 				matchIDsToProcess.UnionWith(playerMatchIDs);
             }
 
 			// remove matches already processed
-			System.Diagnostics.Debug.WriteLine("Removed " + matchIDsToProcess.RemoveWhere(id => context.ProcessedMatches.Any(i => i.MatchID == id)) + " match ids from query.");
+			System.Diagnostics.Debug.WriteLine("Removed " + matchIDsToProcess.RemoveWhere(id => dbContext.ProcessedMatches.Any(i => i.MatchID == id)) + " match ids from query.");
             System.Diagnostics.Debug.WriteLine("Found " + matchIDsToProcess.Count() + " new matches");
 
             // return if no new matches to process
@@ -89,14 +71,14 @@ namespace BanMe.Data
 			// add new matches to processed matches
 			foreach (string matchID in matchIDsToProcess)
             {
-                context.ProcessedMatches.Add(new ProcessedMatch() { MatchID = matchID });
+                dbContext.ProcessedMatches.Add(new ProcessedMatch() { MatchID = matchID });
             }
 
 			// remove oldest processed match entries
-			if (context.ProcessedMatches.Count() > context.PlayerPuuids.Count() * 20)
+			if (dbContext.ProcessedMatches.Count() > dbContext.PlayerPuuids.Count() * 20)
             {
-                int toRemove = context.ProcessedMatches.Count() - context.PlayerPuuids.Count() * 20;
-				context.ProcessedMatches.RemoveRange(context.ProcessedMatches.TakeLast(toRemove));
+                int toRemove = dbContext.ProcessedMatches.Count() - dbContext.PlayerPuuids.Count() * 20;
+				dbContext.ProcessedMatches.RemoveRange(dbContext.ProcessedMatches.TakeLast(toRemove));
 			}
 
             // update recorded games
@@ -113,7 +95,7 @@ namespace BanMe.Data
             {
                 try
                 {
-                    var entry = context.ChampGameStats.FirstOrDefault(e => e.ChampionName == data.Key.ToString());
+                    var entry = dbContext.ChampGameStats.FirstOrDefault(e => e.ChampionName == data.Key.ToString());
 
                     if (entry == null)
                     {
@@ -124,7 +106,7 @@ namespace BanMe.Data
 
 						UpdateChampGameStats(newEntry, data.Value, appInfo.RecordedGames);
 
-						context.ChampGameStats.Add(newEntry);
+						dbContext.ChampGameStats.Add(newEntry);
 					}
                     else
                     {
@@ -135,7 +117,7 @@ namespace BanMe.Data
                 {
 
                 }
-                context.SaveChanges();
+                dbContext.SaveChanges();
             }
         }
 

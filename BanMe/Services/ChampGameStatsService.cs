@@ -1,11 +1,10 @@
 ﻿using BanMe.Data;
 using BanMe.Entities;
-using BanMe.Util;
 using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Services
 {
-    public class ChampGameStatsService : IChampGameStatsService
+	public class ChampGameStatsService : IChampGameStatsService
     {
         private readonly BanMeDbContext _context;
 

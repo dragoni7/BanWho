@@ -4,7 +4,6 @@ using BanMe.Services;
 using Microsoft.EntityFrameworkCore;
 using BanMeInfrastructure;
 using Quartz;
-using Camille.RiotGames.LolStatusV3;
 using BanMe.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +19,8 @@ builder.Services.AddScoped<IChampGameStatsService, ChampGameStatsService>();
 
 builder.Services.AddScoped<IBanMeInfoService, BanMeInfoService>();
 
+builder.Services.AddSingleton<ILeagueDataCrawler, LeagueDataCrawler>();
+
 builder.Services.AddInfrastructure();
 builder.Services.AddMediatRType<PatchUpdatedHandler>();
 
@@ -30,7 +31,7 @@ using (var scope = app.Services.CreateScope())
 	var services = scope.ServiceProvider;
     //await SeedData.InitPlayerDb(services);
     //await SeedData.UpdateBanMeInfoPatch(services);
-	//await SeedData.InitChampGameStatsDb(services);
+	await SeedData.InitChampGameStatsDb(services);
 }
 
 // Configure the HTTP request pipeline.

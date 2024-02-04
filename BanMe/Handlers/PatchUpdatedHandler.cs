@@ -2,7 +2,6 @@
 using BanMeInfrastructure.Jobs;
 using BanMeInfrastructure.Messages;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace BanMe.Handlers
 {
@@ -23,7 +22,7 @@ namespace BanMe.Handlers
 				fetchedPatch = json.First();
 			}
 
-			var appInfo = await banMecontext.AppInfo.FirstAsync();
+			var appInfo = await banMecontext.GetBanMeInfoAsync();
 
 			if (appInfo.PatchUsed != fetchedPatch)
 			{
