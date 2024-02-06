@@ -52,7 +52,7 @@ namespace BanMe.Data
 
 			HashSet<string> matchIDsToProcess = new();
 
-			for (int i = 0; i < 40; i++)
+			for (int i = 0; i < 20; i++)
             {
                 var playerMatchIDs = await dataCrawler.GatherMatchIDsAsync(dbContext.PlayerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
 				matchIDsToProcess.UnionWith(playerMatchIDs);

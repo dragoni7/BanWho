@@ -1,4 +1,5 @@
 ﻿using BanMe.Data;
+using BanMe.Services;
 using BanMeInfrastructure.Jobs;
 using BanMeInfrastructure.Messages;
 using MediatR;
@@ -9,10 +10,11 @@ namespace BanMe.Handlers
 	{
 		public async Task Handle(PatchUpdateMessage request, CancellationToken cancellationToken)
 		{
-			using var scope = request.ServiceProvider.CreateScope();
+			using IServiceScope scope = request.ServiceProvider.CreateScope();
 
 			var dbContext = scope.ServiceProvider.GetRequiredService<BanMeDbContext>();
 			var logger = scope.ServiceProvider.GetRequiredService<ILogger<PatchUpdateBackgroundJob>>();
+			var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
 
 			string fetchedPatch = "";
 
@@ -26,14 +28,15 @@ namespace BanMe.Handlers
 
 			if (appInfo.PatchUsed != fetchedPatch)
 			{
-				logger.LogInformation($"Updated db from old patch {appInfo.PatchUsed} to {fetchedPatch}");
+				logger.LogInformation($"Updating db from old patch {appInfo.PatchUsed} to {fetchedPatch}");
+
 				appInfo.PatchUsed = fetchedPatch;
 
 				await dbContext.DumpPatchDataAsync();
 
-				// re-seed db
+				await seeder.SeedPlayerPuuidsAsync();
 
-				dbContext.SaveChanges();
+				logger.LogInformation("Update complete");
 			}
 
 

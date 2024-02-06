@@ -15,11 +15,15 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContext<BanMeDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddSingleton<IRiotApiInstance, RiotApiInstance>();
+
 builder.Services.AddScoped<IChampGameStatsService, ChampGameStatsService>();
 
 builder.Services.AddScoped<IBanMeInfoService, BanMeInfoService>();
 
-builder.Services.AddSingleton<ILeagueDataCrawler, LeagueDataCrawler>();
+builder.Services.AddScoped<ILeagueDataCrawler, LeagueDataCrawler>();
+
+builder.Services.AddScoped<IDbSeeder, DbSeeder>();
 
 builder.Services.AddInfrastructure();
 builder.Services.AddMediatRType<PatchUpdatedHandler>();
@@ -28,10 +32,10 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-	var services = scope.ServiceProvider;
-    //await SeedData.InitPlayerDb(services);
-    //await SeedData.UpdateBanMeInfoPatch(services);
-	await SeedData.InitChampGameStatsDb(services);
+    var seeder = scope.ServiceProvider.GetRequiredService<IDbSeeder>();
+
+    //await seeder.SeedChampGameStatsAsync();
+    //await seeder.SeedPlayerPuuidsAsync();
 }
 
 // Configure the HTTP request pipeline.

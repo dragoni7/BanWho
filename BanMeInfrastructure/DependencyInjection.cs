@@ -12,7 +12,7 @@ namespace BanMeInfrastructure
 				cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
 			});
 
-			services.AddQuartz(options =>
+			/*services.AddQuartz(options =>
 			{
 				var jobKey = JobKey.Create(nameof(PatchUpdateBackgroundJob));
 
@@ -27,7 +27,7 @@ namespace BanMeInfrastructure
 							);
 			});
 
-			services.AddQuartzHostedService();
+			services.AddQuartzHostedService();*/
 		}
 
 		public static void AddMediatRType<T>(this IServiceCollection services)

@@ -1,4 +1,5 @@
-﻿using BanMe.Data;
+﻿using Azure.Core;
+using BanMe.Data;
 using Camille.Enums;
 using Camille.RiotGames;
 using Camille.RiotGames.LeagueV4;
@@ -8,21 +9,24 @@ namespace BanMe.Services
 {
     public class LeagueDataCrawler : ILeagueDataCrawler
     {
-        private readonly RiotGamesApi _riotApiInstance;
+        private readonly IServiceProvider _serviceProvider;
 
 		public LeagueDataCrawler(IServiceProvider serviceProvider)
         {
-            using var scope = serviceProvider.CreateScope();
-			_riotApiInstance = RiotGamesApi.NewInstance(scope.ServiceProvider.GetRequiredService<BanMeDbContext>().AppInfo.First().ApiKey);
+			_serviceProvider = serviceProvider;
 		}
 
         public async Task<List<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
         {
             HashSet<LeagueEntry> tierEntries = new();
 
-            for (int i = 1; i < 5; i++)
+            RiotGamesApi riotApi = _serviceProvider.GetRequiredService<IRiotApiInstance>().GetApiInstance();
+
+            int lowDivision = tier == Tier.EMERALD ? 4 : 5;
+
+			for (int i = 1; i < lowDivision; i++)
             {
-                var entries = await _riotApiInstance.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
+				var entries = await riotApi.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
                 tierEntries.UnionWith(entries.Where(e => e.Inactive == false));
             }
 
@@ -30,7 +34,7 @@ namespace BanMe.Services
 
             foreach (LeagueEntry entry in tierEntries)
             {
-                var summoner = await _riotApiInstance.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
+                var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
                 puuids.Add(summoner.Puuid);
             }
 
@@ -39,17 +43,54 @@ namespace BanMe.Services
 
         public async Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region)
         {
-            return await _riotApiInstance.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
+			RiotGamesApi riotApi = _serviceProvider.GetRequiredService<IRiotApiInstance>().GetApiInstance();
+
+			return await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
         }
 
         public async Task<HashSet<Match>> CrawlMatchesAsync(HashSet<string> matchIDs, RegionalRoute region)
         {
             HashSet<Match> matchSet = new();
 
-            foreach (string id in matchIDs)
+			RiotGamesApi riotApi = _serviceProvider.GetRequiredService<IRiotApiInstance>().GetApiInstance();
+
+			foreach (string id in matchIDs)
             {
-                Match match = await _riotApiInstance.MatchV5().GetMatchAsync(region, id);
-                matchSet.Add(match);
+                Match match = await riotApi.MatchV5().GetMatchAsync(region, id);
+                string[] matchPatchStr = match.Info.GameVersion.Split(".");
+                int matchPatchNumMajor = Convert.ToInt32(matchPatchStr[0]);
+				int matchPatchNumMinor = Convert.ToInt32(matchPatchStr[1]);
+
+				using IServiceScope scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<BanMeDbContext>();
+				var appInfo = await dbContext.GetBanMeInfoAsync();
+                string[] currentPatchStr = appInfo.PatchUsed.Split(".");
+                int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
+                int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
+
+				if (matchPatchNumMajor > currentPatchMajor || ((matchPatchNumMajor == currentPatchMajor) && matchPatchNumMinor > currentPatchMinor))
+                {
+                    // new patch
+                    matchSet = new();
+
+					string fetchedPatch = "";
+
+					using (HttpClient client = new())
+					{
+						var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
+						fetchedPatch = json.First();
+					}
+
+                    appInfo.PatchUsed = fetchedPatch;
+
+					await dbContext.DumpPatchDataAsync();
+
+					matchSet.Add(match);
+				}
+                else if (matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor == currentPatchMinor)
+                {
+					matchSet.Add(match);
+				}
             }
 
             return matchSet;
