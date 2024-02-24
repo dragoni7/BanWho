@@ -1,6 +1,4 @@
 ﻿@page "/"
-@inject IChampGameStatsService champGameStatsService
-@inject IBanMeInfoService banMeInfoService
 @attribute [StreamRendering(true)]
 
 <PageTitle>BanMe</PageTitle>
@@ -15,7 +13,7 @@
 		<div class="col">
 			<center>
 				<h3>Top</h3>
-				@foreach (var entry in topBans)
+				@foreach (var entry in _recommendedBans[Roles.TOP])
 				{
 					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.TopWinRate" PickRate="entry.TopPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
@@ -24,7 +22,7 @@
 		<div class="col">
 			<center>
 				<h3>Mid</h3>
-				@foreach (var entry in midbans)
+				@foreach (var entry in _recommendedBans[Roles.MIDDLE])
 				{
 					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.MidWinRate" PickRate="entry.MidPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
@@ -33,7 +31,7 @@
 		<div class="col">
 			<center>
 				<h3>Jungle</h3>
-				@foreach (var entry in jungleBans)
+				@foreach (var entry in _recommendedBans[Roles.JUNGLE])
 				{
 					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.JungleWinRate" PickRate="entry.JunglePickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
@@ -42,7 +40,7 @@
 		<div class="col">
 			<center>
 				<h3>Bot</h3>
-				@foreach (var entry in botBans)
+				@foreach (var entry in _recommendedBans[Roles.BOTTOM])
 				{
 					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.BotWinRate" PickRate="entry.BotPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
@@ -51,7 +49,7 @@
 		<div class="col">
 			<center>
 				<h3>Supp</h3>
-				@foreach (var entry in suppBans)
+				@foreach (var entry in _recommendedBans[Roles.SUPPORT])
 				{
 					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.SuppWinRate" PickRate="entry.SuppPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
 				}
@@ -62,23 +60,23 @@
 
 @code {
 
-	List<ChampGameStats> topBans = new();
-	List<ChampGameStats> midbans = new();
-	List<ChampGameStats> jungleBans = new();
-	List<ChampGameStats> botBans = new();
-	List<ChampGameStats> suppBans = new();
+	private Dictionary<string, List<ChampGameStats>> _recommendedBans = new() { { Roles.TOP, new() }, { Roles.MIDDLE, new() }, { Roles.JUNGLE, new () }, { Roles.BOTTOM, new() }, { Roles.SUPPORT, new() } };
 
-	private string currentPatch = "";
+	private string currentPatch = "14.4.1";
+
+	[Inject]
+	private ISender Mediator { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		topBans = await champGameStatsService.GetRecommendedBans(Roles.TOP, 16);
-		midbans = await champGameStatsService.GetRecommendedBans(Roles.MIDDLE, 16);
-		jungleBans = await champGameStatsService.GetRecommendedBans(Roles.JUNGLE, 16);
-		botBans = await champGameStatsService.GetRecommendedBans(Roles.BOTTOM, 16);
-		suppBans = await champGameStatsService.GetRecommendedBans(Roles.SUPPORT, 16);
+		foreach (string role in Roles.ALL)
+		{
+			var query = new GetChampGameStatsByWinRate(role, 10);
 
-		currentPatch = await banMeInfoService.GetPatch();
+			var response = await Mediator.Send(query);
+
+			_recommendedBans[role].AddRange(response.ChampGameStats);
+		}
 	}
 
 	protected string GetChampSquare(string champion)
