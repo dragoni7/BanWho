@@ -111,7 +111,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 					UpdateChampGameStats(entry, data.Value, recordedGames);
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 
 			}
