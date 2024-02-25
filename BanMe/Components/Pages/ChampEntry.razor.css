@@ -1,13 +1,6 @@
-﻿.billboard {
-    background-color: black;
-    text-shadow: 2px 2px 0 #0008;
-    color: #fff;
-}
-
-img {
-    max-width: 50%;
-    height: auto;
-    width: auto\9;
+﻿img {
+    width: 70px;
+    height: 70px;
     margin: 15px;
 }
 
@@ -20,10 +13,10 @@ hr {
 
 h5 {
     font-weight: 600;
-    font-size: 1.25em;
-    line-height: 1.35em;
+    font-size: 1.2em;
+    line-height: 1.3em;
 }
 
-.billboard statText {
+statText {
     color: cornflowerblue;
 }

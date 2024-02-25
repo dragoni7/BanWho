@@ -8,11 +8,13 @@
 <br />
 
 <div class="container">
+
 	<div class="row-cols-lg-1 gy-4">
 		<div class="col d-flex justify-content-center">
 			<h2> Recommended Bans For </h2>
 		</div>
 	</div>
+
 	<div class="row-cols-lg-1 gy-4">
 		<div class="col d-flex justify-content-center">
 			
@@ -40,49 +42,53 @@
 
 		</div>
 	</div>
-	<div class="row row-cols-lg-@_recommendedBans.Count gx-4">
 
 		@foreach(var entry in _recommendedBans)
 		{
-			<div class="col d-flex justify-content-center">
-				<center>
+			<div class="mt-2 row row-cols-lg-auto gx-1">
+				<div class="col d-flex justify-content-left">
 					<h3>@entry.Key.ToString().ToLower()</h3>
+				</div>
+			</div>
 
-			@foreach (var champStat in entry.Value)
-			{
-				switch (entry.Key)
-				{
-					case Roles.TOP:
+			<div class="billboard">
+				<div class="mt-2 mb-md-5 row row-cols-lg-10 gx-2">
+						@foreach (var champStat in entry.Value)
 						{
-							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.TopWinRate" PickRate="champStat.TopPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-							break;
+							<div class="col d-flex justify-content-left">
+								@switch (entry.Key)
+								{
+									case Roles.TOP:
+										{
+											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.TopWinRate" PickRate="champStat.TopPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+											break;
+										}
+									case Roles.MIDDLE:
+										{
+											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.MidWinRate" PickRate="champStat.MidPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+											break;
+										}
+									case Roles.JUNGLE:
+										{
+											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.JungleWinRate" PickRate="champStat.JunglePickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+											break;
+										}
+									case Roles.BOTTOM:
+										{
+											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.BotWinRate" PickRate="champStat.BotPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+											break;
+										}
+									case Roles.SUPPORT:
+										{
+											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.SuppWinRate" PickRate="champStat.SuppPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+											break;
+										}
+								}
+							</div>
 						}
-					case Roles.MIDDLE:
-						{
-							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.MidWinRate" PickRate="champStat.MidPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-							break;
-						}
-					case Roles.JUNGLE:
-						{
-							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.JungleWinRate" PickRate="champStat.JunglePickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-							break;
-						}
-					case Roles.BOTTOM:
-						{
-							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.BotWinRate" PickRate="champStat.BotPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-							break;
-						}
-					case Roles.SUPPORT:
-						{
-							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.SuppWinRate" PickRate="champStat.SuppPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-							break;
-						}
-				}
-			}
-				</center>
+				</div>
 			</div>
 		}
-	</div>
 </div>
 
 @code {
