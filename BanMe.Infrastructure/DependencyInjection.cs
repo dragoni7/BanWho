@@ -22,7 +22,7 @@ public static class DependencyInjection
 		services.AddScoped<IProcessedMatchesRepository, ProcessedMatchesRepository>();
 		services.AddScoped<IRiotDataCrawler, RiotDataCrawler>();
 
-		services.AddQuartz(options =>
+		/*services.AddQuartz(options =>
 		{
 			var jobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
@@ -37,7 +37,7 @@ public static class DependencyInjection
 						);
 		});
 
-		services.AddQuartzHostedService();
+		services.AddQuartzHostedService();*/
 
 		return services;
 	}

@@ -1,60 +1,87 @@
 ﻿@page "/"
 @attribute [StreamRendering(true)]
+@rendermode InteractiveServer
 
 <PageTitle>BanMe</PageTitle>
-
-<center><h2>Recommended Bans</h2></center>
 
 <br />
 <br />
 
 <div class="container">
-	<div class="row row-cols-lg-5 gx-4">
-		<div class="col">
-			<center>
-				<h3>Top</h3>
-				@foreach (var entry in _recommendedBans[Roles.TOP])
-				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.TopWinRate" PickRate="entry.TopPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
-				}
-			</center>
+	<div class="row-cols-lg-1 gy-4">
+		<div class="col d-flex justify-content-center">
+			<h2> Recommended Bans For </h2>
 		</div>
-		<div class="col">
-			<center>
-				<h3>Mid</h3>
-				@foreach (var entry in _recommendedBans[Roles.MIDDLE])
-				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.MidWinRate" PickRate="entry.MidPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
-				}
-			</center>
+	</div>
+	<div class="row-cols-lg-1 gy-4">
+		<div class="col d-flex justify-content-center">
+			
+			<form class="row row-cols-lg-auto g-3 align-items-center">
+
+				<div class="col-12">
+					<label class="visually-hidden" for="inlineFormSelectChamp">Champ Select</label>
+					<select @onchange="ChampChanged" class="form-select border-0 shadow-none bg-dark text-white" id="inlineFormSelectChamp">
+						<option selected>All</option>
+					</select>
+				</div>
+
+				<div class="col-12">
+					<label class="visually-hidden" for="inlineFormSelectRole">Role Select</label>
+					<select @onchange="@(async (e) => await OnRoleChanged(e))" class="form-select border-0 shadow-none bg-dark text-white" id="inlineFormSelectRole">
+						<option selected>Roles</option>
+						<option value="@Roles.TOP">Top</option>
+						<option value="@Roles.MIDDLE">Middle</option>
+						<option value="@Roles.JUNGLE">Jungle</option>
+						<option value="@Roles.BOTTOM">Bottom</option>
+						<option value="@Roles.SUPPORT">Support</option>
+					</select>
+				</div>
+			</form>
+
 		</div>
-		<div class="col">
-			<center>
-				<h3>Jungle</h3>
-				@foreach (var entry in _recommendedBans[Roles.JUNGLE])
+	</div>
+	<div class="row row-cols-lg-@_recommendedBans.Count gx-4">
+
+		@foreach(var entry in _recommendedBans)
+		{
+			<div class="col d-flex justify-content-center">
+				<center>
+					<h3>@entry.Key.ToString().ToLower()</h3>
+
+			@foreach (var champStat in entry.Value)
+			{
+				switch (entry.Key)
 				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.JungleWinRate" PickRate="entry.JunglePickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
+					case Roles.TOP:
+						{
+							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.TopWinRate" PickRate="champStat.TopPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+							break;
+						}
+					case Roles.MIDDLE:
+						{
+							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.MidWinRate" PickRate="champStat.MidPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+							break;
+						}
+					case Roles.JUNGLE:
+						{
+							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.JungleWinRate" PickRate="champStat.JunglePickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+							break;
+						}
+					case Roles.BOTTOM:
+						{
+							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.BotWinRate" PickRate="champStat.BotPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+							break;
+						}
+					case Roles.SUPPORT:
+						{
+							<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.SuppWinRate" PickRate="champStat.SuppPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
+							break;
+						}
 				}
-			</center>
-		</div>
-		<div class="col">
-			<center>
-				<h3>Bot</h3>
-				@foreach (var entry in _recommendedBans[Roles.BOTTOM])
-				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.BotWinRate" PickRate="entry.BotPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
-				}
-			</center>
-		</div>
-		<div class="col">
-			<center>
-				<h3>Supp</h3>
-				@foreach (var entry in _recommendedBans[Roles.SUPPORT])
-				{
-					<ChampEntry ChampionName="@entry.ChampionName" WinRate="entry.SuppWinRate" PickRate="entry.SuppPickRate" BanRate="entry.BanRate" ImageSource=@GetChampSquare(entry.ChampionName) />
-				}
-			</center>
-		</div>
+			}
+				</center>
+			</div>
+		}
 	</div>
 </div>
 
@@ -86,6 +113,41 @@
 			champion = "NUNU";
 		}
 		return $"https://cdn.communitydragon.org/{currentPatch}/champion/{champion}/square";
+	}
+
+	private async Task OnRoleChanged(ChangeEventArgs e)
+	{
+		string role = e.Value.ToString();
+
+		_recommendedBans.Clear();
+
+		GetChampGameStatsByWinRate query;
+		ChampGameStatsResponse response;
+
+		if (role == "Roles")
+		{
+			foreach (string r in Roles.ALL)
+			{
+				query = new GetChampGameStatsByWinRate(r, 10);
+
+				response = await Mediator.Send(query);
+
+				_recommendedBans.Add(r, response.ChampGameStats);
+			}
+
+			return;
+		}
+
+		query = new GetChampGameStatsByWinRate(role, 10);
+
+		response = await Mediator.Send(query);
+
+		_recommendedBans.Add(role, response.ChampGameStats);
+	}
+
+	private async void ChampChanged(ChangeEventArgs e)
+	{
+
 	}
 }
 
