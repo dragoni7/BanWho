@@ -3,6 +3,7 @@ using BanMe.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(BanMeDbContext))]
-    partial class BanMeContextModelSnapshot : ModelSnapshot
+    [Migration("20240229183425_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,7 +24,7 @@ namespace BanMe.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("BanMe.Entities.BanMeInfo", b =>
+            modelBuilder.Entity("BanMe.Domain.Entities.BanMeInfo", b =>
                 {
                     b.Property<string>("AppVersion")
                         .HasColumnType("nvarchar(450)");
@@ -41,7 +44,7 @@ namespace BanMe.Infrastructure.Migrations
                     b.ToTable("AppInfo");
                 });
 
-            modelBuilder.Entity("BanMe.Entities.ChampGameStats", b =>
+            modelBuilder.Entity("BanMe.Domain.Entities.ChampGameStats", b =>
                 {
                     b.Property<string>("ChampionName")
                         .HasColumnType("nvarchar(450)");
@@ -117,7 +120,7 @@ namespace BanMe.Infrastructure.Migrations
                     b.ToTable("ChampGameStats");
                 });
 
-            modelBuilder.Entity("BanMe.Entities.ChampMatchupStats", b =>
+            modelBuilder.Entity("BanMe.Domain.Entities.ChampMatchupStats", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,8 +128,9 @@ namespace BanMe.Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ChampGameStatsChampionName")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<string>("ChampionName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EnemyChampion")
                         .IsRequired()
@@ -143,12 +147,10 @@ namespace BanMe.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChampGameStatsChampionName");
-
                     b.ToTable("ChampMatchupStats");
                 });
 
-            modelBuilder.Entity("BanMe.Entities.Player", b =>
+            modelBuilder.Entity("BanMe.Domain.Entities.Player", b =>
                 {
                     b.Property<string>("PUUID")
                         .HasColumnType("nvarchar(450)");
@@ -158,7 +160,7 @@ namespace BanMe.Infrastructure.Migrations
                     b.ToTable("PlayerPuuids");
                 });
 
-            modelBuilder.Entity("BanMe.Entities.ProcessedMatch", b =>
+            modelBuilder.Entity("BanMe.Domain.Entities.ProcessedMatch", b =>
                 {
                     b.Property<string>("MatchID")
                         .HasColumnType("nvarchar(450)");
@@ -166,18 +168,6 @@ namespace BanMe.Infrastructure.Migrations
                     b.HasKey("MatchID");
 
                     b.ToTable("ProcessedMatches");
-                });
-
-            modelBuilder.Entity("BanMe.Entities.ChampMatchupStats", b =>
-                {
-                    b.HasOne("BanMe.Entities.ChampGameStats", null)
-                        .WithMany("MatchupStats")
-                        .HasForeignKey("ChampGameStatsChampionName");
-                });
-
-            modelBuilder.Entity("BanMe.Entities.ChampGameStats", b =>
-                {
-                    b.Navigation("MatchupStats");
                 });
 #pragma warning restore 612, 618
         }

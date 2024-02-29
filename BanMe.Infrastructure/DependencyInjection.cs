@@ -17,12 +17,13 @@ public static class DependencyInjection
 			throw new InvalidOperationException("connection string DefaultConnection not found")));
 
 		services.AddScoped<IChampGameStatsRepository, ChampGameStatsRepository>();
+		services.AddScoped<IChampMatchupStatsRepository, ChampMatchupStatsRepository>();
 		services.AddScoped<IBanMeInfoRepository, BanMeInfoRepository>();
 		services.AddScoped<IPlayerPuuidRepository, PlayerPuuidRepository>();
 		services.AddScoped<IProcessedMatchesRepository, ProcessedMatchesRepository>();
 		services.AddScoped<IRiotDataCrawler, RiotDataCrawler>();
 
-		/*services.AddQuartz(options =>
+		services.AddQuartz(options =>
 		{
 			var jobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
@@ -32,12 +33,12 @@ public static class DependencyInjection
 					trigger
 						.ForJob(jobKey)
 						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInSeconds(10)
+						schedule.WithIntervalInSeconds(5)
 						.WithRepeatCount(0))
 						);
 		});
 
-		services.AddQuartzHostedService();*/
+		services.AddQuartzHostedService();
 
 		return services;
 	}

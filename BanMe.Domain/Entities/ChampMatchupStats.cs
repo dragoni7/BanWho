@@ -14,4 +14,6 @@ public class ChampMatchupStats
 	public float WinRate { get; set; } = 0f;
 
 	public int Picks { get; set; } = 0;
+
+	public string ChampionName { get; set; }
 }

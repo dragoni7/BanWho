@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.1" />
+    <PackageReference Include="MudBlazor" Version="6.16.0" />
     <ProjectReference Include="..\BanMe.Application\BanMe.Application.csproj" />
     <ProjectReference Include="..\BanMe.Client\BanMe.WebUI.Client.csproj" />
     <ProjectReference Include="..\BanMe.Infrastructure\BanMe.Infrastructure.csproj" />

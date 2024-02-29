@@ -36,7 +36,6 @@ internal class RiotDataCrawler : IRiotDataCrawler
         foreach (LeagueEntry entry in tierEntries)
         {
             var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
-            System.Diagnostics.Debug.Print("summoner puuid: " + summoner);
             puuids.Add(summoner.Puuid);
         }
 

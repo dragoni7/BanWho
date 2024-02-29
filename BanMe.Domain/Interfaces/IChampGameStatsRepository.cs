@@ -6,9 +6,9 @@ public interface IChampGameStatsRepository
 {
     void Add(ChampGameStats entity);
 
-    public ChampGameStats? GetByChampName(string champName);
+	public Task<ChampGameStats> GetByChampNameAsync(string champName);
 
-	Task<List<ChampGameStats>> GetByWinRatesAsync(string role, int amount);
+	public Task<List<ChampGameStats>> GetByWinRatesAsync(string role, int amount);
 
     public Task SaveAsync();
 }

@@ -21,29 +21,27 @@
 			<form class="row row-cols-lg-auto g-3 align-items-center">
 
 				<div class="col-12">
-					<label class="visually-hidden" for="inlineFormSelectChamp">Champ Select</label>
-					<select @onchange="ChampChanged" class="form-select border-0 shadow-none bg-dark text-white" id="inlineFormSelectChamp">
-						<option selected>All</option>
-					</select>
+					<MudAutocomplete T="string" Label="Champion" SearchFunc="@SearchChamps" ValueChanged="@(async (value)=> await OnChampChanged(value))"
+									 ResetValueOnEmptyText="true"
+									 CoerceText="true" CoerceValue="true" />
 				</div>
 
 				<div class="col-12">
-					<label class="visually-hidden" for="inlineFormSelectRole">Role Select</label>
-					<select @onchange="@(async (e) => await OnRoleChanged(e))" class="form-select border-0 shadow-none bg-dark text-white" id="inlineFormSelectRole">
-						<option selected>Roles</option>
-						<option value="@Roles.TOP">Top</option>
-						<option value="@Roles.MIDDLE">Middle</option>
-						<option value="@Roles.JUNGLE">Jungle</option>
-						<option value="@Roles.BOTTOM">Bottom</option>
-						<option value="@Roles.SUPPORT">Support</option>
-					</select>
+					<MudSelect T="string" Label="Role" AnchorOrigin="Origin.CenterCenter" ValueChanged="@(async (value) => await OnRoleChanged(value))">
+						<MudSelectItem Value="@Roles.ANY" />
+						<MudSelectItem Value="@Roles.TOP" />
+						<MudSelectItem Value="@Roles.MIDDLE" />
+						<MudSelectItem Value="@Roles.JUNGLE" />
+						<MudSelectItem Value="@Roles.BOTTOM" />
+						<MudSelectItem Value="@Roles.SUPPORT" />
+					</MudSelect>
 				</div>
 			</form>
 
 		</div>
 	</div>
 
-		@foreach(var entry in _recommendedBans)
+		@foreach(var entry in _roleBans)
 		{
 			<div class="mt-2 row row-cols-lg-auto gx-1">
 				<div class="col d-flex justify-content-left">
@@ -53,7 +51,10 @@
 
 			<div class="billboard">
 				<div class="mt-2 mb-md-5 row row-cols-lg-10 gx-2">
-						@foreach (var champStat in entry.Value)
+
+					@if (_useRoleBans)
+					{
+						foreach (var champStat in entry.Value)
 						{
 							<div class="col d-flex justify-content-left">
 								@switch (entry.Key)
@@ -86,6 +87,16 @@
 								}
 							</div>
 						}
+					}
+					else
+					{
+						foreach(ChampMatchupStats matchup in _champBans)
+						{
+							<div class="col d-flex justify-content-left">
+								<ChampEntry ChampionName="@matchup.EnemyChampion" WinRate="matchup.WinRate" PickRate="matchup.Picks" BanRate="0" ImageSource=@GetChampSquare(matchup.EnemyChampion) />
+							</div>
+						}
+					}
 				</div>
 			</div>
 		}
@@ -93,9 +104,19 @@
 
 @code {
 
-	private Dictionary<string, List<ChampGameStats>> _recommendedBans = new() { { Roles.TOP, new() }, { Roles.MIDDLE, new() }, { Roles.JUNGLE, new () }, { Roles.BOTTOM, new() }, { Roles.SUPPORT, new() } };
+	private Dictionary<string, List<ChampGameStats>> _roleBans = new() { { Roles.TOP, new() }, { Roles.MIDDLE, new() }, { Roles.JUNGLE, new () }, { Roles.BOTTOM, new() }, { Roles.SUPPORT, new() } };
+
+	private List<ChampMatchupStats> _champBans = new();
 
 	private string currentPatch = "14.4.1";
+
+	private string _selectedChamp = "NONE";
+
+	private string _selectedRole = Roles.ANY;
+
+	private string[] _champNames = Enum.GetNames(typeof(Champion));
+
+	private bool _useRoleBans = true;
 
 	[Inject]
 	private ISender Mediator { get; set; }
@@ -108,7 +129,7 @@
 
 			var response = await Mediator.Send(query);
 
-			_recommendedBans[role].AddRange(response.ChampGameStats);
+			_roleBans[role].AddRange(response.ChampGameStats);
 		}
 	}
 
@@ -121,16 +142,50 @@
 		return $"https://cdn.communitydragon.org/{currentPatch}/champion/{champion}/square";
 	}
 
-	private async Task OnRoleChanged(ChangeEventArgs e)
+	private async Task<IEnumerable<string>> SearchChamps(string value)
 	{
-		string role = e.Value.ToString();
+		await Task.Delay(5);
 
-		_recommendedBans.Clear();
+		if (string.IsNullOrEmpty(value))
+		{
+			return _champNames;
+		}
+
+		return _champNames.Where(n => n.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+	}
+
+	private async Task OnChampChanged(string value)
+	{
+		if (value != string.Empty)
+		{
+			_selectedChamp = value;
+			_useRoleBans = false;
+
+			_champBans.Clear();
+
+			GetChampMatchupStatsByWinRate query;
+			ChampMatchupStatsResponse response;
+
+			query = new GetChampMatchupStatsByWinRate(value, 10);
+			response = await Mediator.Send(query);
+
+			_champBans = response.ChampMatchupStats;
+
+			System.Diagnostics.Debug.WriteLine(_champBans.Count);
+		}
+	}
+
+	private async Task OnRoleChanged(string value)
+	{
+		_selectedRole = value;
+		_useRoleBans = true;
+
+		_roleBans.Clear();
 
 		GetChampGameStatsByWinRate query;
 		ChampGameStatsResponse response;
 
-		if (role == "Roles")
+		if (value == Roles.ANY)
 		{
 			foreach (string r in Roles.ALL)
 			{
@@ -138,22 +193,17 @@
 
 				response = await Mediator.Send(query);
 
-				_recommendedBans.Add(r, response.ChampGameStats);
+				_roleBans.Add(r, response.ChampGameStats);
 			}
 
 			return;
 		}
 
-		query = new GetChampGameStatsByWinRate(role, 10);
+		query = new GetChampGameStatsByWinRate(value, 10);
 
 		response = await Mediator.Send(query);
 
-		_recommendedBans.Add(role, response.ChampGameStats);
-	}
-
-	private async void ChampChanged(ChangeEventArgs e)
-	{
-
+		_roleBans.Add(value, response.ChampGameStats);
 	}
 }
 

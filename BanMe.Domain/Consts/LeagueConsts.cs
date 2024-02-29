@@ -4,6 +4,8 @@ public class LeagueConsts
 {
     public static class Roles
     {
+        public const string ANY = "ANY";
+
         public const string TOP = "TOP";
 
         public const string MIDDLE = "MIDDLE";

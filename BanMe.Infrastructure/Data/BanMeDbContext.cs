@@ -11,13 +11,20 @@ public class BanMeDbContext : DbContext
 
     public DbSet<ChampGameStats> ChampGameStats { get; set; } = default!;
 
+    public DbSet<ChampMatchupStats> ChampMatchupStats { get; set; } = default!;
+
     public DbSet<Player> PlayerPuuids { get; set; } = default!;
 
     public DbSet<ProcessedMatch> ProcessedMatches { get; set; } = default!;
 
     public DbSet<BanMeInfo> AppInfo { get; set; } = default!;
 
-    public async Task<BanMeInfo> GetBanMeInfoAsync()
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
+	{
+
+	}
+
+	public async Task<BanMeInfo> GetBanMeInfoAsync()
     {
 		return await AppInfo.FirstAsync();
     }

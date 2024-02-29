@@ -50,6 +50,4 @@ public class ChampGameStats
 	public int Bans { get; set; } = 0;
 
 	public float BanRate { get; set; } = 0f;
-
-	public IList<ChampMatchupStats> MatchupStats { get; set; } = new List<ChampMatchupStats>();
 }

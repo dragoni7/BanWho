@@ -22,23 +22,29 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	private readonly IChampGameStatsRepository _champGameStatsRepository;
 
+	private readonly IChampMatchupStatsRepository _champMatchupStatsRepository;
+
 	public UpdateChampGameStatsBackgroundJob
 		(IRiotDataCrawler riotDataCrawler,
 		IPlayerPuuidRepository playerPuuidRepository,
 		IProcessedMatchesRepository processedMatchesRepository,
 		IBanMeInfoRepository banMeInfoRepository,
-		IChampGameStatsRepository champGameStatsRepository)
+		IChampGameStatsRepository champGameStatsRepository,
+		IChampMatchupStatsRepository champMatchupStatsRepository)
 	{
 		_riotDataCrawler = riotDataCrawler;
 		_playerPuuidRepository = playerPuuidRepository;
 		_processedMatchesRepository = processedMatchesRepository;
 		_banMeInfoRepository = banMeInfoRepository;
 		_champGameStatsRepository = champGameStatsRepository;
+		_champMatchupStatsRepository = champMatchupStatsRepository;
 	}
 
 	public async Task Execute(IJobExecutionContext context)
 	{
+		System.Diagnostics.Debug.WriteLine("Starting Update Champ Game Stats Background Job...");
 		await SeedChampGameStatsAsync();
+		System.Diagnostics.Debug.WriteLine("Finished Update Champ Game Stats Background Job...");
 	}
 
 	public async Task SeedChampGameStatsAsync()
@@ -49,7 +55,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 
-		for (int i = 0; i < 200; i++)
+		for (int i = 0; i < 20; i++)
 		{
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(playerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
 			matchIDsToProcess.UnionWith(playerMatchIDs);
@@ -80,7 +86,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		System.Diagnostics.Debug.WriteLine("Recorded games after to adding = " + recordedGames);
+		System.Diagnostics.Debug.WriteLine("Recorded games after adding = " + recordedGames);
 
 		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();
@@ -93,7 +99,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		{
 			try
 			{
-				var entry = _champGameStatsRepository.GetByChampName(data.Key.ToString());
+				var entry = await _champGameStatsRepository.GetByChampNameAsync(data.Key.ToString());
 
 				if (entry == null)
 				{
@@ -103,20 +109,23 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 					};
 
 					UpdateChampGameStats(newEntry, data.Value, recordedGames);
+					await UpdateChampMatchupStatsAsync(newEntry, data.Value.MatchUps);
 
 					_champGameStatsRepository.Add(newEntry);
+
+					await _champGameStatsRepository.SaveAsync();
 				}
 				else
 				{
 					UpdateChampGameStats(entry, data.Value, recordedGames);
+					await UpdateChampMatchupStatsAsync(entry, data.Value.MatchUps);
+					await _champGameStatsRepository.SaveAsync();
 				}
 			}
 			catch (Exception)
 			{
 
 			}
-
-			await _champGameStatsRepository.SaveAsync();
 		}
 	}
 
@@ -150,27 +159,39 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		entry.SuppPickRate = MathUtil.AsPercentageOf(entry.SuppPicks, recordedGames);
 
 		entry.BanRate = MathUtil.AsPercentageOf(entry.Bans, recordedGames);
+	}
 
-		foreach (var matchup in stats.MatchUps)
+	private async Task UpdateChampMatchupStatsAsync(ChampGameStats entry, Dictionary<Champion, WinStats> matchupStats)
+	{
+		var existingMatchups = await _champMatchupStatsRepository.GetAllMatchupsByChampAsync(entry.ChampionName);
+
+		foreach (var matchup in matchupStats)
 		{
-			var m = entry.MatchupStats.FirstOrDefault(m => m.EnemyChampion == matchup.Key.ToString());
+			var m = existingMatchups.FirstOrDefault(e => e.EnemyChampion == matchup.Key.ToString());
 
-			if (m != null)
+			if (m == null)
 			{
-				int index = entry.MatchupStats.IndexOf(m);
-				entry.MatchupStats.ElementAt(index).Wins += matchup.Value.Wins;
-				entry.MatchupStats.ElementAt(index).Picks += matchup.Value.Picks;
-			}
-			else
-			{
-				entry.MatchupStats.Add(new ChampMatchupStats()
-				{
+				System.Diagnostics.Debug.WriteLine("Added Matchup");
+
+				_champMatchupStatsRepository.Add(new()
+				{ 
 					EnemyChampion = matchup.Key.ToString(),
 					Wins = matchup.Value.Wins,
 					Picks = matchup.Value.Picks,
-					WinRate = MathUtil.AsPercentageOf(matchup.Value.Wins, matchup.Value.Picks)
+					WinRate = MathUtil.AsPercentageOf(matchup.Value.Wins, matchup.Value.Picks),
+					ChampionName = entry.ChampionName
 				});
 			}
+            else
+            {
+				System.Diagnostics.Debug.WriteLine("Updated Matchup");
+
+				m.Wins += matchup.Value.Wins;
+				m.Picks += matchup.Value.Picks;
+				m.WinRate = MathUtil.AsPercentageOf(m.Wins, m.Picks);
+            }
+
+			await _champMatchupStatsRepository.SaveAsync();
 		}
 	}
 }
