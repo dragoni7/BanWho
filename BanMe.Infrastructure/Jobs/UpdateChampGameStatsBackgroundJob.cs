@@ -55,7 +55,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 
-		for (int i = 0; i < 20; i++)
+		for (int i = 0; i < 200; i++)
 		{
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(playerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
 			matchIDsToProcess.UnionWith(playerMatchIDs);
@@ -171,8 +171,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 			if (m == null)
 			{
-				System.Diagnostics.Debug.WriteLine("Added Matchup");
-
 				_champMatchupStatsRepository.Add(new()
 				{ 
 					EnemyChampion = matchup.Key.ToString(),
@@ -184,8 +182,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			}
             else
             {
-				System.Diagnostics.Debug.WriteLine("Updated Matchup");
-
 				m.Wins += matchup.Value.Wins;
 				m.Picks += matchup.Value.Picks;
 				m.WinRate = MathUtil.AsPercentageOf(m.Wins, m.Picks);

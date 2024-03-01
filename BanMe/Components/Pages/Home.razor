@@ -170,8 +170,6 @@
 			response = await Mediator.Send(query);
 
 			_champBans = response.ChampMatchupStats;
-
-			System.Diagnostics.Debug.WriteLine(_champBans.Count);
 		}
 	}
 

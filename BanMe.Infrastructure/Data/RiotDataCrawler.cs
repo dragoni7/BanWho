@@ -5,6 +5,7 @@ using Camille.RiotGames;
 using System.Net.Http.Json;
 using Camille.RiotGames.LeagueV4;
 using BanMe.Domain.Consts;
+using System.Text.Json;
 
 namespace BanMe.Infrastructure.Data;
 
@@ -57,38 +58,47 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
         foreach (string id in matchIDs)
         {
-            Match match = await riotApi.MatchV5().GetMatchAsync(region, id);
-            string[] matchPatchStr = match.Info.GameVersion.Split(".");
-            int matchPatchNumMajor = Convert.ToInt32(matchPatchStr[0]);
-            int matchPatchNumMinor = Convert.ToInt32(matchPatchStr[1]);
-
-            var appInfo = await _context.GetBanMeInfoAsync();
-            string[] currentPatchStr = appInfo.PatchUsed.Split(".");
-            int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
-            int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
-
-            if (matchPatchNumMajor > currentPatchMajor || matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor > currentPatchMinor)
+            try
             {
-                // new patch
-                matchSet = new();
+				Match match = await riotApi.MatchV5().GetMatchAsync(region, id);
 
-                string fetchedPatch = "";
+				string[] matchPatchStr = match.Info.GameVersion.Split(".");
+				int matchPatchNumMajor = Convert.ToInt32(matchPatchStr[0]);
+				int matchPatchNumMinor = Convert.ToInt32(matchPatchStr[1]);
 
-                using (HttpClient client = new())
-                {
-                    var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
-                    fetchedPatch = json.First();
-                }
+				var appInfo = await _context.GetBanMeInfoAsync();
+				string[] currentPatchStr = appInfo.PatchUsed.Split(".");
+				int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
+				int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
 
-                appInfo.PatchUsed = fetchedPatch;
+				if (matchPatchNumMajor > currentPatchMajor || matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor > currentPatchMinor)
+				{
+					// new patch
+					matchSet = new();
 
-                await _context.DumpPatchDataAsync();
+					string fetchedPatch = "";
 
-                matchSet.Add(match);
-            }
-            else if (matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor == currentPatchMinor)
+					using (HttpClient client = new())
+					{
+						var json = await client.GetFromJsonAsync<List<string>>("http://ddragon.leagueoflegends.com/api/versions.json");
+						fetchedPatch = json.First();
+					}
+
+					appInfo.PatchUsed = fetchedPatch;
+
+					await _context.DumpPatchDataAsync();
+
+					matchSet.Add(match);
+				}
+				else if (matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor == currentPatchMinor)
+				{
+					matchSet.Add(match);
+				}
+			}
+            catch (JsonException e)
             {
-                matchSet.Add(match);
+                // error with new gamemode? wait for Camille update.
+                continue;
             }
         }
 
