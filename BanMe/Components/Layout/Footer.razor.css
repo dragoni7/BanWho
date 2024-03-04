@@ -1,2 +1,9 @@
-﻿body {
+﻿footer {
+    position: sticky;
+    background-image: linear-gradient(rgba(255,0,0,0), rgb(35, 44, 77));
+    height: -100px;
+    color: white;
+    display: flex;
+    font-family: roboto condensed, Arial, Helvetica, sans-serif;
+    font-size: 14px;
 }

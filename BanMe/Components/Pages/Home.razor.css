@@ -1,5 +1,8 @@
-﻿.billboard {
-    background-color: black;
-    text-shadow: 2px 2px 0 #0008;
-    color: #fff;
+﻿.aurelionsol {
+    background-image: url('Assets/legend_fullscreen_aurelionsol_2048.png');
+    background-size: contain;
+    width: 1000px;
+    height: 500px;
+    box-shadow: 0 0 20px 20px inset;
+    color: rgb(33, 33, 33);
 }

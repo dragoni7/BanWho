@@ -4,23 +4,20 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<div class="page">
-    <main>
+<MudLayout>
+    <Header />
+    <MudMainContent>
 
-        <div class="top-row px-4">
-            <Header />
-        </div>
-
-        <article class="content px-4">
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
             @Body
-        </article>
+        </MudContainer>
 
-        <div class="bottom-row px-4">
-            <Footer />
-        </div>
+    </MudMainContent>
 
-    </main>
-</div>
+    <br />
+
+    <Footer />
+</MudLayout>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.
@@ -33,7 +30,26 @@
         {
             PaletteDark = new PaletteDark()
             {
-                Primary = Colors.Blue.Lighten1
+                Primary = Colors.Blue.Darken1,
+                Secondary = Colors.BlueGrey.Lighten1,
+                Tertiary = Colors.Purple.Default,
+                Background = Colors.Grey.Darken4,
+            },
+
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "roboto condensed", "Arial", "Helvetica", "sans-serif" }
+                },
+
+                H3 = new H3()
+                {
+                    FontFamily = new[] { "roboto condensed", "Arial", "Helvetica", "sans-serif" },
+                    FontSize = "34px",
+                    FontWeight = 600,
+                    LineHeight = 2.0
+                }
             }
         };
 }

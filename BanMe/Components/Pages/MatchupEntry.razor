@@ -1,0 +1,29 @@
+﻿<div class="container">
+
+	<img src=@ImageSource alt="@ChampionName">
+
+	<div class="row d-flex justify-content-center">
+		<h5>@ChampionName</h5>
+	</div>
+	<div class="row d-flex justify-content-center">
+		<h5>WinRate: <statText>@WinRate.ToString("N2")%</statText></h5>
+	</div>
+	<div class="row d-flex justify-content-center">
+		<h5>Games: <statText>@Games.ToString()</statText></h5>
+	</div>
+</div>
+
+
+@code {
+	[Parameter]
+	public string ImageSource { get; set; } = "https://cdn.communitydragon.org/14.2.1/champion/NONE/square";
+
+	[Parameter]
+	public string ChampionName { get; set; } = "Not Found";
+
+	[Parameter]
+	public float WinRate { get; set; } = 0f;
+
+	[Parameter]
+	public int Games { get; set; } = 0;
+}

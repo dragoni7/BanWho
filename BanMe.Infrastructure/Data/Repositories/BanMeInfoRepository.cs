@@ -22,5 +22,17 @@ namespace BanMe.Infrastructure.Data.Repositories
 			var appInfo = await _context.GetBanMeInfoAsync();
 			appInfo.RecordedGames += numToAdd;
 		}
+
+		public async Task<string> GetAppVersionAsync()
+		{
+			var appInfo = await _context.GetBanMeInfoAsync();
+			return appInfo.AppVersion;
+		}
+
+		public async Task<string> GetPatchUsedAsync()
+		{
+			var appInfo = await _context.GetBanMeInfoAsync();
+			return appInfo.PatchUsed;
+		}
 	}
 }

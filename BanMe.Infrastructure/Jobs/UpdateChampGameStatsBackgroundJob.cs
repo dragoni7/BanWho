@@ -55,11 +55,11 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 
-		for (int i = 0; i < 200; i++)
+		foreach (var player in playerPuuids)
 		{
-			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(playerPuuids.ElementAt(i).PUUID, RegionalRoute.AMERICAS);
-			matchIDsToProcess.UnionWith(playerMatchIDs);
-		}
+            var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, RegionalRoute.AMERICAS);
+            matchIDsToProcess.UnionWith(playerMatchIDs);
+        }
 
 		// remove matches already processed
 		matchIDsToProcess.RemoveWhere(id => _processedMatchesRepository.ContainsMatchId(id));

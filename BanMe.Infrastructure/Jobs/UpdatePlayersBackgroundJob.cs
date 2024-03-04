@@ -21,7 +21,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		Tier[] selectedTiers = { Tier.EMERALD, Tier.DIAMOND };
+		Tier[] selectedTiers = { Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER, Tier.CHALLENGER };
 
 		await _playerPuuidRepository.ClearAsync();
 

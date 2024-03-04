@@ -4,133 +4,223 @@
 
 <PageTitle>BanMe</PageTitle>
 
-<br />
-<br />
+<MudGrid Justify="Justify.Center" Spacing="1">
 
-<div class="container">
+	<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full">
+		<MudTabs Elevation="1" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6" @bind-ActivePanelIndex="UseRoleBans">
 
-	<div class="row-cols-lg-1 gy-4">
-		<div class="col d-flex justify-content-center">
-			<h2> Recommended Bans For </h2>
-		</div>
-	</div>
+			<MudTabPanel>
+				<ChildContent>
+					<MudSelect Dense="true" T="string" Label="Role" AnchorOrigin="Origin.CenterCenter" ValueChanged="@(async (value) => await OnRoleChanged(value))">
+						<MudSelectItem Value="@Roles.TOP">
+							<img src="Assets\positionicon-top.png" height="28" width="28" class="mr-1" /> TOP
+						</MudSelectItem>
+						<MudSelectItem Value="@Roles.MIDDLE">
+							<img src="Assets\positionicon-mid.png" height="28" width="28" class="mr-1" /> MIDDLE
+						</MudSelectItem>
+						<MudSelectItem Value="@Roles.JUNGLE">
+							<img src="Assets\positionicon-jungle.png" height="28" width="28" class="mr-1" /> JUNGLE
+						</MudSelectItem>
+						<MudSelectItem Value="@Roles.BOTTOM">
+							<img src="Assets\positionicon-bottom.png" height="28" width="28" class="mr-1" /> BOTTOM
+						</MudSelectItem>
+						<MudSelectItem Value="@Roles.SUPPORT">
+							<img src="Assets\positionicon-support.png" height="28" width="28" class="mr-1" /> SUPPORT
+						</MudSelectItem>
+					</MudSelect>
+				</ChildContent>
+				<TabWrapperContent>
+					<MudTooltip Text="View Top Bans by Roles">
+						@context
+					</MudTooltip>
+				</TabWrapperContent>
+				<TabContent>
+					<MudText>Role Bans</MudText>
+				</TabContent>
+			</MudTabPanel>
 
-	<div class="row-cols-lg-1 gy-4">
-		<div class="col d-flex justify-content-center">
-			
-			<form class="row row-cols-lg-auto g-3 align-items-center">
-
-				<div class="col-12">
-					<MudAutocomplete T="string" Label="Champion" SearchFunc="@SearchChamps" ValueChanged="@(async (value)=> await OnChampChanged(value))"
+			<MudTabPanel>
+				<ChildContent>
+					<MudAutocomplete Dense="true" T="string" Label="Champion" SearchFunc="@SearchChamps" ValueChanged="@(async (value)=> await OnChampChanged(value))"
 									 ResetValueOnEmptyText="true"
 									 CoerceText="true" CoerceValue="true" />
-				</div>
+				</ChildContent>
+				<TabWrapperContent>
+					<MudTooltip Text="View Top Bans by Matchups">
+						@context
+					</MudTooltip>
+				</TabWrapperContent>
+				<TabContent>
+					<MudText>Matchup Bans</MudText>
+				</TabContent>
+			</MudTabPanel>
 
-				<div class="col-12">
-					<MudSelect T="string" Label="Role" AnchorOrigin="Origin.CenterCenter" ValueChanged="@(async (value) => await OnRoleChanged(value))">
-						<MudSelectItem Value="@Roles.ANY" />
-						<MudSelectItem Value="@Roles.TOP" />
-						<MudSelectItem Value="@Roles.MIDDLE" />
-						<MudSelectItem Value="@Roles.JUNGLE" />
-						<MudSelectItem Value="@Roles.BOTTOM" />
-						<MudSelectItem Value="@Roles.SUPPORT" />
-					</MudSelect>
-				</div>
-			</form>
+		</MudTabs>
 
-		</div>
-	</div>
+	</MudItem>
 
-		@foreach(var entry in _roleBans)
-		{
-			<div class="mt-2 row row-cols-lg-auto gx-1">
-				<div class="col d-flex justify-content-left">
-					<h3>@entry.Key.ToString().ToLower()</h3>
-				</div>
-			</div>
+	<MudAlert Severity="Severity.Info" Dense="true" Elevation="3" Class="my-1">Current Patch: @_currentPatch</MudAlert>
+	<MudAlert Severity="Severity.Info" Dense="true" Elevation="3" Class="my-1">App Version: @_appVersion</MudAlert>
+	<MudAlert Severity="Severity.Normal" Dense="true" Icon="@Icons.Material.Filled.Analytics" Elevation="3" Class="my-1">Games Recorded: @_recordedGames</MudAlert>
 
-			<div class="billboard">
-				<div class="mt-2 mb-md-5 row row-cols-lg-10 gx-2">
+	<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
+			<MudStack Spacing="1">
+				<MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Info" IconColor="Color.Warning" Color="Color.Warning" OnClick="OnExpandCollapseClick">@(_dataSourceExpanded ? "Collapse Info" : "Data Source Info")</MudButton>
+				<MudCollapse Expanded="_dataSourceExpanded">
+					<MudGrid Justify="Justify.Center">
+						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Region: NA</MudAlert>
+						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Game Ranks: Emerald 4+</MudAlert>
+					</MudGrid>
+				</MudCollapse>
+			</MudStack>
+	</MudItem>
 
-					@if (_useRoleBans)
+</MudGrid>
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+	@if (UseRoleBans == 0 && _roleBans.Count() > 0)
+	{
+		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
+			<MudText Typo="Typo.h5">Recommended Bans</MudText>
+			<br />
+		</MudItem>
+
+		<MudDataGrid Items="@_roleBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
+			<Columns>
+				<TemplateColumn Title="Champion">
+					<CellTemplate>
+						<MudStack Row>
+							<MudImage ObjectFit="ObjectFit.ScaleDown" Src="@GetChampSquare(context.Item.ChampionName)" Width="40" Height="40" Alt="@context.Item.ChampionName" />
+							<MudText>@context.Item.ChampionName</MudText>
+							</MudStack>
+						</CellTemplate>
+					</TemplateColumn>
+					@switch (_selectedRole)
 					{
-						foreach (var champStat in entry.Value)
-						{
-							<div class="col d-flex justify-content-left">
-								@switch (entry.Key)
-								{
-									case Roles.TOP:
-										{
-											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.TopWinRate" PickRate="champStat.TopPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-											break;
-										}
-									case Roles.MIDDLE:
-										{
-											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.MidWinRate" PickRate="champStat.MidPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-											break;
-										}
-									case Roles.JUNGLE:
-										{
-											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.JungleWinRate" PickRate="champStat.JunglePickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-											break;
-										}
-									case Roles.BOTTOM:
-										{
-											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.BotWinRate" PickRate="champStat.BotPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-											break;
-										}
-									case Roles.SUPPORT:
-										{
-											<ChampEntry ChampionName="@champStat.ChampionName" WinRate="champStat.SuppWinRate" PickRate="champStat.SuppPickRate" BanRate="champStat.BanRate" ImageSource=@GetChampSquare(champStat.ChampionName) />
-											break;
-										}
-								}
-							</div>
-						}
+						case Roles.TOP:
+							{
+								<PropertyColumn Property="x => x.TopWinRate" Format="F2" Title="Win Rate" />
+								<PropertyColumn Property="x => x.TopPickRate" Format="F2" Title="Pick Rate" />
+								break;
+							}
+						case Roles.MIDDLE:
+							{
+								<PropertyColumn Property="x => x.MidWinRate" Format="F2" Title="Win Rate" />
+								<PropertyColumn Property="x => x.MidPickRate" Format="F2" Title="Pick Rate" />
+								break;
+							}
+						case Roles.JUNGLE:
+							{
+								<PropertyColumn Property="x => x.JungleWinRate" Format="F2" Title="Win Rate" />
+								<PropertyColumn Property="x => x.JunglePickRate" Format="F2" Title="Pick Rate" />
+								break;
+							}
+						case Roles.BOTTOM:
+							{
+								<PropertyColumn Property="x => x.BotWinRate" Format="F2" Title="Win Rate" />
+								<PropertyColumn Property="x => x.BotPickRate" Format="F2" Title="Pick Rate" />
+								break;
+							}
+						case Roles.SUPPORT:
+							{
+								<PropertyColumn Property="x => x.SuppWinRate" Format="F2" Title="Win Rate" />
+								<PropertyColumn Property="x => x.SuppPickRate" Format="F2" Title="Pick Rate" />
+								break;
+							}
 					}
-					else
-					{
-						foreach(ChampMatchupStats matchup in _champBans)
-						{
-							<div class="col d-flex justify-content-left">
-								<ChampEntry ChampionName="@matchup.EnemyChampion" WinRate="matchup.WinRate" PickRate="matchup.Picks" BanRate="0" ImageSource=@GetChampSquare(matchup.EnemyChampion) />
-							</div>
-						}
-					}
-				</div>
-			</div>
-		}
-</div>
+				<PropertyColumn Property="x => x.BanRate" Format="F2" Title="Ban Rate" />
+			</Columns>
+		</MudDataGrid>
+	}
+	else if (_matchupBans.Count() > 0)
+	{
+		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
+			<MudText Typo="Typo.h5">Recommended Bans</MudText>
+			<br />
+		</MudItem>
+
+		<MudDataGrid Items="@_matchupBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
+			<Columns>
+				<TemplateColumn Title="Champion">
+					<CellTemplate>
+						<MudStack Row>
+							<MudImage ObjectFit="ObjectFit.ScaleDown" Src="@GetChampSquare(context.Item.EnemyChampion)" Width="40" Height="40" Alt="@context.Item.EnemyChampion" />
+							<MudText>@context.Item.EnemyChampion</MudText>
+							</MudStack>
+						</CellTemplate>
+					</TemplateColumn>
+					<PropertyColumn Property="x => x.WinRate" Format="F2" Title="Win Rate" />
+					<PropertyColumn Property="x => x.Picks" Title="Games Played" />
+				</Columns>
+			</MudDataGrid>
+	}
+	else
+	{
+		<div class="aurelionsol" />
+		<br />
+	}
+
+</MudContainer>
 
 @code {
+	private IEnumerable<ChampGameStats> _roleBans = new List<ChampGameStats>();
 
-	private Dictionary<string, List<ChampGameStats>> _roleBans = new() { { Roles.TOP, new() }, { Roles.MIDDLE, new() }, { Roles.JUNGLE, new () }, { Roles.BOTTOM, new() }, { Roles.SUPPORT, new() } };
+	private List<ChampMatchupStats> _matchupBans = new();
 
-	private List<ChampMatchupStats> _champBans = new();
+	private string _selectedRole = string.Empty;
 
-	private string currentPatch = "14.4.1";
+	private string _currentPatch = string.Empty;
 
-	private string _selectedChamp = "NONE";
+	private string _appVersion = string.Empty;
 
-	private string _selectedRole = Roles.ANY;
+	private int _recordedGames = 0;
 
 	private string[] _champNames = Enum.GetNames(typeof(Champion));
 
-	private bool _useRoleBans = true;
+	private int _useRolebans = 0;
+
+	private bool _dataSourceExpanded = false;
+
+	private int UseRoleBans 
+	{ 
+		get
+		{
+			return _useRolebans;
+		}
+
+		set
+		{
+			if (_useRolebans != value)
+			{
+				_matchupBans = new();
+				_roleBans = new List<ChampGameStats>();
+				_selectedRole = "";
+			}
+
+			_useRolebans = value;
+		} 
+	}
 
 	[Inject]
 	private ISender Mediator { get; set; }
 
 	protected override async Task OnInitializedAsync()
 	{
-		foreach (string role in Roles.ALL)
-		{
-			var query = new GetChampGameStatsByWinRate(role, 10);
+		GetPatchUsed patchQuery = new();
+		PatchUsedResponse patchResponse = await Mediator.Send(patchQuery);
 
-			var response = await Mediator.Send(query);
+		_currentPatch = patchResponse.patchUsed;
 
-			_roleBans[role].AddRange(response.ChampGameStats);
-		}
+		GetAppVersion appVersionQuery = new();
+		AppVersionResponse appVersionResponse = await Mediator.Send(appVersionQuery);
+
+		_appVersion = appVersionResponse.appVersion;
+
+		GetRecordedGames recordedGamesQuery = new();
+		RecordedGamesResponse recordedGamesResponse = await Mediator.Send(recordedGamesQuery);
+
+		_recordedGames = recordedGamesResponse.recordedGames;
 	}
 
 	protected string GetChampSquare(string champion)
@@ -139,12 +229,13 @@
 		{
 			champion = "NUNU";
 		}
-		return $"https://cdn.communitydragon.org/{currentPatch}/champion/{champion}/square";
+
+		return $"https://cdn.communitydragon.org/{_currentPatch}/champion/{champion}/square";
 	}
 
 	private async Task<IEnumerable<string>> SearchChamps(string value)
 	{
-		await Task.Delay(5);
+		await Task.Delay(1);
 
 		if (string.IsNullOrEmpty(value))
 		{
@@ -154,54 +245,34 @@
 		return _champNames.Where(n => n.Contains(value, StringComparison.InvariantCultureIgnoreCase));
 	}
 
+	private void OnExpandCollapseClick()
+	{
+		_dataSourceExpanded = !_dataSourceExpanded;
+	}
+
 	private async Task OnChampChanged(string value)
 	{
 		if (value != string.Empty)
 		{
-			_selectedChamp = value;
-			_useRoleBans = false;
+			_matchupBans.Clear();
 
-			_champBans.Clear();
+			GetChampMatchupStatsByWinRate query = new GetChampMatchupStatsByWinRate(value, 10);
+			ChampMatchupStatsResponse response = await Mediator.Send(query);
 
-			GetChampMatchupStatsByWinRate query;
-			ChampMatchupStatsResponse response;
-
-			query = new GetChampMatchupStatsByWinRate(value, 10);
-			response = await Mediator.Send(query);
-
-			_champBans = response.ChampMatchupStats;
+			_matchupBans = response.ChampMatchupStats;
 		}
 	}
 
 	private async Task OnRoleChanged(string value)
 	{
 		_selectedRole = value;
-		_useRoleBans = true;
 
-		_roleBans.Clear();
+		_roleBans = new List<ChampGameStats>();
 
-		GetChampGameStatsByWinRate query;
-		ChampGameStatsResponse response;
+		GetChampGameStatsByWinRate query = new GetChampGameStatsByWinRate(value, 10);
+		ChampGameStatsResponse response = await Mediator.Send(query);
 
-		if (value == Roles.ANY)
-		{
-			foreach (string r in Roles.ALL)
-			{
-				query = new GetChampGameStatsByWinRate(r, 10);
-
-				response = await Mediator.Send(query);
-
-				_roleBans.Add(r, response.ChampGameStats);
-			}
-
-			return;
-		}
-
-		query = new GetChampGameStatsByWinRate(value, 10);
-
-		response = await Mediator.Send(query);
-
-		_roleBans.Add(value, response.ChampGameStats);
+		_roleBans = response.ChampGameStats;
 	}
 }
 

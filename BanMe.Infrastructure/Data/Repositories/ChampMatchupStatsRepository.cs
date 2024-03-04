@@ -27,7 +27,7 @@ internal class ChampMatchupStatsRepository : IChampMatchupStatsRepository
 	{
 		var champMatchupStats = await _context.ChampMatchupStats.Where(e => e.ChampionName == champ).ToListAsync();
 
-		return champMatchupStats.OrderByDescending(entry => entry.Picks).ThenByDescending(entry => entry.WinRate).Take(amount).ToList();
+		return champMatchupStats.OrderByDescending(entry => entry.WinRate).ThenByDescending(entry => entry.Picks).Take(amount).ToList();
 	}
 
 	public async Task SaveAsync()
