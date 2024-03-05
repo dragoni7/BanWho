@@ -22,7 +22,7 @@ namespace BanMe.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AppInfo", x => x.AppVersion);
-                });*/
+                });
 
             migrationBuilder.CreateTable(
                 name: "ChampGameStats",
@@ -72,20 +72,21 @@ namespace BanMe.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ChampMatchupStats", x => x.Id);
-                });
+                });*/
 
-            /*migrationBuilder.CreateTable(
+            migrationBuilder.CreateTable(
                 name: "PlayerPuuids",
                 columns: table => new
                 {
-                    PUUID = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    PUUID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RegionalRoute = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PlayerPuuids", x => x.PUUID);
-                });*/
+                });
 
-            migrationBuilder.CreateTable(
+            /*migrationBuilder.CreateTable(
                 name: "ProcessedMatches",
                 columns: table => new
                 {
@@ -94,7 +95,7 @@ namespace BanMe.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProcessedMatches", x => x.MatchID);
-                });
+                });*/
         }
 
         /// <inheritdoc />

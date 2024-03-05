@@ -1,4 +1,5 @@
-﻿using BanMe.Domain.Entities;
+﻿using BanMe.Domain.Consts;
+using BanMe.Domain.Entities;
 using BanMe.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,7 +28,7 @@ internal class ChampMatchupStatsRepository : IChampMatchupStatsRepository
 	{
 		var champMatchupStats = await _context.ChampMatchupStats.Where(e => e.ChampionName == champ).ToListAsync();
 
-		return champMatchupStats.OrderByDescending(entry => entry.WinRate).ThenByDescending(entry => entry.Picks).Take(amount).ToList();
+		return champMatchupStats.OrderByDescending(entry => (entry.WinRate > BanMeConsts.StatThresholds.MinWinRate && entry.WinRate < BanMeConsts.StatThresholds.MaxWinRate)).ThenByDescending(entry => entry.Picks > BanMeConsts.StatThresholds.MinPicks).Take(amount).ToList();
 	}
 
 	public async Task SaveAsync()

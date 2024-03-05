@@ -152,6 +152,9 @@ namespace BanMe.Infrastructure.Migrations
                     b.Property<string>("PUUID")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("RegionalRoute")
+                        .HasColumnType("int");
+
                     b.HasKey("PUUID");
 
                     b.ToTable("PlayerPuuids");

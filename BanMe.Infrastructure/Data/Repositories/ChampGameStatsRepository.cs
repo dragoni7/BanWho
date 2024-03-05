@@ -31,54 +31,49 @@ internal class ChampGameStatsRepository : IChampGameStatsRepository
 		{
 			case LeagueConsts.Roles.TOP:
 				{
-					var topWins = await _context.ChampGameStats
-						.OrderByDescending(entry => entry.TopPickRate)
+					champGameStats = await _context.ChampGameStats
+						.OrderByDescending(entry => entry.TopWinRate > BanMeConsts.StatThresholds.MinWinRate)
+						.ThenByDescending(entry => entry.TopPickRate)
 						.Take(amount)
 						.ToListAsync();
-
-					champGameStats = [.. topWins.OrderByDescending(entry => entry.TopWinRate)];
 
 					break;
 				}
 			case LeagueConsts.Roles.MIDDLE:
 				{
-					var topWins = await _context.ChampGameStats
-						.OrderByDescending(entry => entry.MidPickRate)
+					champGameStats = await _context.ChampGameStats
+						.OrderByDescending(entry => entry.MidWinRate > BanMeConsts.StatThresholds.MinWinRate)
+						.ThenByDescending(entry => entry.MidPickRate)
 						.Take(amount)
 						.ToListAsync();
-
-					champGameStats = [.. topWins.OrderByDescending(entry => entry.MidWinRate)];
 
 					break;
 				}
 			case LeagueConsts.Roles.JUNGLE:
 				{
-					var topWins = await _context.ChampGameStats
-						.OrderByDescending(entry => entry.JunglePickRate)
+					champGameStats = await _context.ChampGameStats
+						.OrderByDescending(entry => entry.JungleWinRate > BanMeConsts.StatThresholds.MinWinRate)
+						.ThenByDescending(entry => entry.JunglePickRate)
 						.Take(amount)
 						.ToListAsync();
-
-					champGameStats = [.. topWins.OrderByDescending(entry => entry.JungleWinRate)];
 					break;
 				}
 			case LeagueConsts.Roles.BOTTOM:
 				{
-					var topWins = await _context.ChampGameStats
-						.OrderByDescending(entry => entry.BotPickRate)
+					champGameStats = await _context.ChampGameStats
+						.OrderByDescending(entry => entry.BotWinRate > BanMeConsts.StatThresholds.MinWinRate)
+						.ThenByDescending(entry => entry.BotPickRate)
 						.Take(amount)
 						.ToListAsync();
-
-					champGameStats = [.. topWins.OrderByDescending(entry => entry.BotWinRate)];
 					break;
 				}
 			case LeagueConsts.Roles.SUPPORT:
 				{
-					var topWins = await _context.ChampGameStats
-						.OrderByDescending(entry => entry.SuppPickRate)
+					champGameStats = await _context.ChampGameStats
+						.OrderByDescending(entry => entry.SuppWinRate > BanMeConsts.StatThresholds.MinWinRate)
+						.ThenByDescending(entry => entry.SuppPickRate)
 						.Take(amount)
 						.ToListAsync();
-
-					champGameStats = [.. topWins.OrderByDescending(entry => entry.SuppWinRate)];
 					break;
 				}
 		}

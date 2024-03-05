@@ -25,6 +25,7 @@ public static class DependencyInjection
 
 		services.AddQuartz(options =>
 		{
+#if DEBUG
 			var jobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
@@ -36,6 +37,32 @@ public static class DependencyInjection
 						schedule.WithIntervalInSeconds(5)
 						.WithRepeatCount(0))
 						);
+#else
+			var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
+
+			options
+				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey)
+				.AddTrigger(trigger => trigger.StartNow())
+				.AddTrigger(trigger =>
+					trigger
+						.ForJob(updatePlayersJobKey)
+						.WithSimpleSchedule(schedule =>
+						schedule.WithIntervalInHours(168) // every week
+						.RepeatForever())
+						);
+
+			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
+
+			options
+				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
+				.AddTrigger(trigger =>
+					trigger
+						.ForJob(updateChampStatsJobKey)
+						.WithSimpleSchedule(schedule =>
+						schedule.WithIntervalInHours(72) // every 3 days
+						.RepeatForever())
+						);
+#endif
 		});
 
 		services.AddQuartzHostedService();

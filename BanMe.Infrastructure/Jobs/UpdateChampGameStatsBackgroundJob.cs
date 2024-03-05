@@ -42,42 +42,77 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		System.Diagnostics.Debug.WriteLine("Starting Update Champ Game Stats Background Job...");
+		System.Diagnostics.Debug.WriteLine("Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 		await SeedChampGameStatsAsync();
-		System.Diagnostics.Debug.WriteLine("Finished Update Champ Game Stats Background Job...");
+		System.Diagnostics.Debug.WriteLine("Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 	}
 
 	public async Task SeedChampGameStatsAsync()
 	{
 		// gather match ids from players
-
-		HashSet<string> matchIDsToProcess = new();
-
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
+		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new();
 
-		foreach (var player in playerPuuids)
+#if DEBUG
+		int i = 0;
+#endif
+
+		foreach (Player player in playerPuuids)
 		{
-            var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, RegionalRoute.AMERICAS);
-            matchIDsToProcess.UnionWith(playerMatchIDs);
-        }
+			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);
 
-		// remove matches already processed
-		matchIDsToProcess.RemoveWhere(id => _processedMatchesRepository.ContainsMatchId(id));
-		System.Diagnostics.Debug.WriteLine("Found " + matchIDsToProcess.Count() + " unprocessed matches");
+			if (!matchIDsToProcess.ContainsKey((RegionalRoute)player.RegionalRoute))
+			{
+				matchIDsToProcess.Add((RegionalRoute)player.RegionalRoute, new());
+			}
 
-		// return if no new matches to process
-		if (matchIDsToProcess.Count() == 0)
-		{
-			return;
+			var newMatchIDs = playerMatchIDs.Where(id => !_processedMatchesRepository.ContainsMatchId(id));
+
+			if (newMatchIDs.Any())
+			{
+				matchIDsToProcess[(RegionalRoute)player.RegionalRoute].UnionWith(newMatchIDs);
+#if DEBUG
+				i++;
+
+				if (i == 200)
+				{
+					break;
+				}
+#endif
+			}
+			else
+			{
+				continue;
+			}
 		}
 
-		// get new matches
-		HashSet<Match> matches = await _riotDataCrawler.CrawlMatchesAsync(matchIDsToProcess, RegionalRoute.AMERICAS);
+		int unprocessedMatches = 0;
 
-		// add new matches to processed matches
-		foreach (string matchId in matchIDsToProcess)
+		foreach (var matchIDs in matchIDsToProcess.Values)
 		{
-			_processedMatchesRepository.Add(new ProcessedMatch() { MatchID = matchId });
+			unprocessedMatches += matchIDs.Count;
+		}
+
+		System.Diagnostics.Debug.WriteLine("Found " + unprocessedMatches + " unprocessed matches");
+
+		// return if no new matches to process
+		if (unprocessedMatches == 0)
+			return;
+
+		HashSet<Match> matches = new();
+
+		// get new matches
+		foreach (var matchIDSet in matchIDsToProcess)
+		{
+			var crawledMatches = await _riotDataCrawler.CrawlMatchesAsync(matchIDSet.Value, matchIDSet.Key);
+
+			matches.UnionWith(crawledMatches);
+
+			// add new matches to processed matches
+			foreach (string matchId in matchIDSet.Value)
+			{
+				_processedMatchesRepository.Add(new ProcessedMatch() { MatchID = matchId });
+			}
 		}
 
 		// update recorded games
@@ -86,7 +121,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		System.Diagnostics.Debug.WriteLine("Recorded games after adding = " + recordedGames);
+		System.Diagnostics.Debug.WriteLine("Updated recorded games = " + recordedGames);
 
 		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();

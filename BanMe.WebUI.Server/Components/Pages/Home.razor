@@ -30,7 +30,7 @@
 					</MudSelect>
 				</ChildContent>
 				<TabWrapperContent>
-					<MudTooltip Text="View Top Bans by Roles">
+					<MudTooltip Text="View Recommended Bans by Roles">
 						@context
 					</MudTooltip>
 				</TabWrapperContent>
@@ -46,7 +46,7 @@
 									 CoerceText="true" CoerceValue="true" />
 				</ChildContent>
 				<TabWrapperContent>
-					<MudTooltip Text="View Top Bans by Matchups">
+					<MudTooltip Text="View Recommended Bans by Matchups">
 						@context
 					</MudTooltip>
 				</TabWrapperContent>
@@ -61,15 +61,15 @@
 
 	<MudAlert Severity="Severity.Info" Dense="true" Elevation="3" Class="my-1">Current Patch: @_currentPatch</MudAlert>
 	<MudAlert Severity="Severity.Info" Dense="true" Elevation="3" Class="my-1">App Version: @_appVersion</MudAlert>
-	<MudAlert Severity="Severity.Normal" Dense="true" Icon="@Icons.Material.Filled.Analytics" Elevation="3" Class="my-1">Games Recorded: @_recordedGames</MudAlert>
+	<MudAlert Severity="Severity.Normal" Dense="true" Icon="@Icons.Material.Filled.Analytics" Style="color: rgb(171, 71, 188)" Elevation="3" Class="my-1">Games Recorded: @_recordedGames</MudAlert>
 
 	<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
 			<MudStack Spacing="1">
 				<MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.Info" IconColor="Color.Warning" Color="Color.Warning" OnClick="OnExpandCollapseClick">@(_dataSourceExpanded ? "Collapse Info" : "Data Source Info")</MudButton>
 				<MudCollapse Expanded="_dataSourceExpanded">
 					<MudGrid Justify="Justify.Center">
-						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Region: NA</MudAlert>
-						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Game Ranks: Emerald 4+</MudAlert>
+						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Region: Global</MudAlert>
+						<MudAlert Severity="Severity.Normal" Elevation="3" NoIcon="true" Class="my-1">Game Ranks: Emerald IV+</MudAlert>
 					</MudGrid>
 				</MudCollapse>
 			</MudStack>
@@ -77,13 +77,14 @@
 
 </MudGrid>
 
-<MudContainer MaxWidth="MaxWidth.Medium">
+<MudDivider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="py-10">
 
 	@if (UseRoleBans == 0 && _roleBans.Count() > 0)
 	{
-		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
+		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-2">
 			<MudText Typo="Typo.h5">Recommended Bans</MudText>
-			<br />
 		</MudItem>
 
 		<MudDataGrid Items="@_roleBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
@@ -100,32 +101,32 @@
 					{
 						case Roles.TOP:
 							{
-								<PropertyColumn Property="x => x.TopWinRate" Format="F2" Title="Win Rate" />
-								<PropertyColumn Property="x => x.TopPickRate" Format="F2" Title="Pick Rate" />
+								<PropertyColumn Property="x => x.TopWinRate" Format="F2" Title="Win Rate %" />
+								<PropertyColumn Property="x => x.TopPickRate" Format="F2" Title="Pick Rate %" />
 								break;
 							}
 						case Roles.MIDDLE:
 							{
-								<PropertyColumn Property="x => x.MidWinRate" Format="F2" Title="Win Rate" />
-								<PropertyColumn Property="x => x.MidPickRate" Format="F2" Title="Pick Rate" />
+								<PropertyColumn Property="x => x.MidWinRate" Format="F2" Title="Win Rate %" />
+								<PropertyColumn Property="x => x.MidPickRate" Format="F2" Title="Pick Rate %" />
 								break;
 							}
 						case Roles.JUNGLE:
 							{
-								<PropertyColumn Property="x => x.JungleWinRate" Format="F2" Title="Win Rate" />
-								<PropertyColumn Property="x => x.JunglePickRate" Format="F2" Title="Pick Rate" />
+								<PropertyColumn Property="x => x.JungleWinRate" Format="F2" Title="Win Rate %" />
+								<PropertyColumn Property="x => x.JunglePickRate" Format="F2" Title="Pick Rate %" />
 								break;
 							}
 						case Roles.BOTTOM:
 							{
-								<PropertyColumn Property="x => x.BotWinRate" Format="F2" Title="Win Rate" />
-								<PropertyColumn Property="x => x.BotPickRate" Format="F2" Title="Pick Rate" />
+								<PropertyColumn Property="x => x.BotWinRate" Format="F2" Title="Win Rate %" />
+								<PropertyColumn Property="x => x.BotPickRate" Format="F2" Title="Pick Rate %" />
 								break;
 							}
 						case Roles.SUPPORT:
 							{
-								<PropertyColumn Property="x => x.SuppWinRate" Format="F2" Title="Win Rate" />
-								<PropertyColumn Property="x => x.SuppPickRate" Format="F2" Title="Pick Rate" />
+								<PropertyColumn Property="x => x.SuppWinRate" Format="F2" Title="Win Rate %" />
+								<PropertyColumn Property="x => x.SuppPickRate" Format="F2" Title="Pick Rate %" />
 								break;
 							}
 					}
@@ -135,9 +136,17 @@
 	}
 	else if (_matchupBans.Count() > 0)
 	{
-		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-0">
-			<MudText Typo="Typo.h5">Recommended Bans</MudText>
-			<br />
+		<MudItem xs="12" Class="d-flex flex-column align-center justify-center mud-width-full py-2">
+			<MudGrid Justify="Justify.Center" Spacing="1">
+				<MudItem>
+					<MudText Typo="Typo.h5">Recommended Bans</MudText>
+				</MudItem>
+				<MudItem>
+					<MudTooltip Text="Disclaimer: data does not account for roles in matchups." Color="Color.Tertiary" Style="font-size: 14px;">
+						<MudIcon Icon="@Icons.Material.Outlined.Info" Color="Color.Tertiary" />
+					</MudTooltip>
+				</MudItem>
+			</MudGrid>
 		</MudItem>
 
 		<MudDataGrid Items="@_matchupBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
@@ -150,7 +159,7 @@
 							</MudStack>
 						</CellTemplate>
 					</TemplateColumn>
-					<PropertyColumn Property="x => x.WinRate" Format="F2" Title="Win Rate" />
+					<PropertyColumn Property="x => x.WinRate" Format="F2" Title="Win Rate %" />
 					<PropertyColumn Property="x => x.Picks" Title="Games Played" />
 				</Columns>
 			</MudDataGrid>
@@ -225,9 +234,23 @@
 
 	protected string GetChampSquare(string champion)
 	{
-		if (champion == "NUNUWILLUMP")
+		switch(champion)
 		{
-			champion = "NUNU";
+			case "NUNUWILLUMP":
+				{
+					champion = "NUNU";
+					break;
+				}
+			case "WUKONG":
+				{
+					champion = "MONKEYKING";
+					break;
+				}
+			case "RENATAGLASC":
+				{
+					champion = "RENATA";
+					break;
+				}
 		}
 
 		return $"https://cdn.communitydragon.org/{_currentPatch}/champion/{champion}/square";
@@ -256,7 +279,7 @@
 		{
 			_matchupBans.Clear();
 
-			GetChampMatchupStatsByWinRate query = new GetChampMatchupStatsByWinRate(value, 10);
+			GetChampMatchupStatsByWinRate query = new GetChampMatchupStatsByWinRate(value, DataThresholds.DataAmountToDisplay);
 			ChampMatchupStatsResponse response = await Mediator.Send(query);
 
 			_matchupBans = response.ChampMatchupStats;
@@ -269,7 +292,7 @@
 
 		_roleBans = new List<ChampGameStats>();
 
-		GetChampGameStatsByWinRate query = new GetChampGameStatsByWinRate(value, 10);
+		GetChampGameStatsByWinRate query = new GetChampGameStatsByWinRate(value, DataThresholds.DataAmountToDisplay);
 		ChampGameStatsResponse response = await Mediator.Send(query);
 
 		_roleBans = response.ChampGameStats;

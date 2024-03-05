@@ -17,26 +17,58 @@ internal class RiotDataCrawler : IRiotDataCrawler
         _context = context;
     }
 
-    public async Task<List<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
+    public async Task<HashSet<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
     {
-        HashSet<LeagueEntry> tierEntries = new();
-
         RiotGamesApi riotApi = RiotGamesApi.NewInstance(_context.AppInfo.First().ApiKey);
+		
+        HashSet<string> puuids = new();
 
-        int lowDivision = tier == Tier.EMERALD ? 4 : 5;
-
-        for (int i = 1; i < lowDivision; i++)
+		switch (tier)
         {
-            var entries = await riotApi.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
-            tierEntries.UnionWith(entries.Where(e => e.Inactive == false));
-        }
+            case Tier.MASTER:
+                {
+					var entries = await riotApi.LeagueV4().GetMasterLeagueAsync(region, QueueType.RANKED_SOLO_5x5);
 
-        List<string> puuids = new();
+                    puuids = await GetPuuidsFromLeagueListAsync(riotApi, entries, region);
 
-        foreach (LeagueEntry entry in tierEntries)
-        {
-            var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(PlatformRoute.NA1, entry.SummonerId);
-            puuids.Add(summoner.Puuid);
+					break;
+				}
+            case Tier.GRANDMASTER:
+                {
+					var entries = await riotApi.LeagueV4().GetGrandmasterLeagueAsync(region, QueueType.RANKED_SOLO_5x5);
+
+					puuids = await GetPuuidsFromLeagueListAsync(riotApi, entries, region);
+
+					break;
+				}
+			case Tier.CHALLENGER:
+				{
+					var entries = await riotApi.LeagueV4().GetChallengerLeagueAsync(region, QueueType.RANKED_SOLO_5x5);
+
+					puuids = await GetPuuidsFromLeagueListAsync(riotApi, entries, region);
+
+					break;
+				}
+			default:
+                {
+					HashSet<LeagueEntry> tierEntries = new();
+
+					int lowDivision = tier == Tier.EMERALD ? 4 : 5;
+
+					for (int i = 1; i < lowDivision; i++)
+					{
+						var entries = await riotApi.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
+						tierEntries.UnionWith(entries.Where(e => e.Inactive == false));
+					}
+
+					foreach (LeagueEntry entry in tierEntries)
+					{
+						var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(region, entry.SummonerId);
+						puuids.Add(summoner.Puuid);
+					}
+
+					break;
+				}
         }
 
         return puuids;
@@ -182,6 +214,19 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
         return champStats;
     }
+
+    private async Task<HashSet<string>> GetPuuidsFromLeagueListAsync(RiotGamesApi riotApi, LeagueList list, PlatformRoute platformRoute)
+    {
+		HashSet<string> puuids = new();
+
+		foreach (LeagueItem entry in list.Entries.Where(e => e.Inactive == false))
+		{
+			var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(platformRoute, entry.SummonerId);
+			puuids.Add(summoner.Puuid);
+		}
+
+        return puuids;
+	}
 
     private void GetDataFromTeams(TeamData teamAData, TeamData teamBData, Dictionary<Champion, FlatChampStats> champStats)
     {

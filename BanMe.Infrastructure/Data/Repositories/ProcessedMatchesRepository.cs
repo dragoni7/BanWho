@@ -1,4 +1,5 @@
-﻿using BanMe.Domain.Entities;
+﻿using BanMe.Domain.Consts;
+using BanMe.Domain.Entities;
 using BanMe.Domain.Interfaces;
 
 namespace BanMe.Infrastructure.Data.Repositories
@@ -22,9 +23,9 @@ namespace BanMe.Infrastructure.Data.Repositories
 			var playerPuuids = _context.PlayerPuuids;
 			var processedMatches = _context.ProcessedMatches;
 
-			if (processedMatches.Count() > playerPuuids.Count() * 20)
+			if (processedMatches.Count() > playerPuuids.Count() * BanMeConsts.DataThresholds.MatchesTrackedPerPlayer)
 			{
-				int toRemove = playerPuuids.Count() - playerPuuids.Count() * 20;
+				int toRemove = playerPuuids.Count() - playerPuuids.Count() * BanMeConsts.DataThresholds.MatchesTrackedPerPlayer;
 				processedMatches.RemoveRange(processedMatches.TakeLast(toRemove));
 			}
 		}

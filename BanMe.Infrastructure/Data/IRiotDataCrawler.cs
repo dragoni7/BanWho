@@ -6,7 +6,7 @@ namespace BanMe.Infrastructure.Data;
 
 internal interface IRiotDataCrawler
 {
-    public Task<List<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region);
+    public Task<HashSet<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region);
 
     public Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region);
 

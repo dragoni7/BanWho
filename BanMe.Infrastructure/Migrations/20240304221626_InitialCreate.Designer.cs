@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BanMe.Infrastructure.Migrations
 {
     [DbContext(typeof(BanMeDbContext))]
-    [Migration("20240229183425_InitialCreate")]
+    [Migration("20240304221626_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -154,6 +154,9 @@ namespace BanMe.Infrastructure.Migrations
                 {
                     b.Property<string>("PUUID")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("RegionalRoute")
+                        .HasColumnType("int");
 
                     b.HasKey("PUUID");
 
