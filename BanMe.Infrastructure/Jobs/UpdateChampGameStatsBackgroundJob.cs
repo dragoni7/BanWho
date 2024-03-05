@@ -42,9 +42,9 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		System.Diagnostics.Debug.WriteLine("Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow);
+		System.Diagnostics.Trace.WriteLine("Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 		await SeedChampGameStatsAsync();
-		System.Diagnostics.Debug.WriteLine("Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow);
+		System.Diagnostics.Trace.WriteLine("Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 	}
 
 	public async Task SeedChampGameStatsAsync()
@@ -93,7 +93,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			unprocessedMatches += matchIDs.Count;
 		}
 
-		System.Diagnostics.Debug.WriteLine("Found " + unprocessedMatches + " unprocessed matches");
+		System.Diagnostics.Trace.WriteLine("Found " + unprocessedMatches + " unprocessed matches");
 
 		// return if no new matches to process
 		if (unprocessedMatches == 0)
@@ -116,12 +116,12 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		}
 
 		// update recorded games
-		System.Diagnostics.Debug.WriteLine("Found " + matches.Count + " new matches");
+		System.Diagnostics.Trace.WriteLine("Found " + matches.Count + " new matches");
 
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		System.Diagnostics.Debug.WriteLine("Updated recorded games = " + recordedGames);
+		System.Diagnostics.Trace.WriteLine("Updated recorded games = " + recordedGames);
 
 		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();
