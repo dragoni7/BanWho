@@ -20,7 +20,6 @@ public static class DependencyInjection
 		services.AddDbContext<BanWhoDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING") ??
 			throw new InvalidOperationException("connection string AZURE_SQL_CONNECTIONSTRING not found")));
 #endif
-
 		services.AddScoped<IChampGameStatsRepository, ChampGameStatsRepository>();
 		services.AddScoped<IChampMatchupStatsRepository, ChampMatchupStatsRepository>();
 		services.AddScoped<IBanWhoInfoRepository, BanWhoInfoRepository>();
