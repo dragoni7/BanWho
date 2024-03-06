@@ -52,7 +52,7 @@ public static class DependencyInjection
 					trigger
 						.ForJob(updatePlayersJobKey)
 						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(168) // every week
+						schedule.WithIntervalInHours(168)
 						.RepeatForever())
 						);
 
@@ -64,7 +64,7 @@ public static class DependencyInjection
 					trigger
 						.ForJob(updateChampStatsJobKey)
 						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(72) // every 3 days
+						schedule.WithIntervalInHours(72)
 						.RepeatForever())
 						);
 #endif
