@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider IsDarkMode="true" Theme="BanWhoTheme"/>
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <Header />
+    <MudMainContent>
+
+        <MudContainer MaxWidth="MaxWidth.ExtraLarge">
+            @Body
+        </MudContainer>
+
+    </MudMainContent>
+
+    <br />
+
+    <Footer />
+</MudLayout>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+
+@code {
+    MudTheme BanWhoTheme = new MudTheme()
+        {
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Blue.Darken1,
+                Secondary = Colors.BlueGrey.Lighten1,
+                Tertiary = Colors.Purple.Lighten1,
+                Background = Colors.Grey.Darken4,
+            },
+
+            Typography = new Typography()
+            {
+                Default = new Default()
+                {
+                    FontFamily = new[] { "roboto condensed", "Arial", "Helvetica", "sans-serif" }
+                },
+
+                H3 = new H3()
+                {
+                    FontFamily = new[] { "roboto condensed", "Arial", "Helvetica", "sans-serif" },
+                    FontSize = "36px",
+                    FontWeight = 550,
+                    LineHeight = 2.0
+                }
+            }
+        };
+}
