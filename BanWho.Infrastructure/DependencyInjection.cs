@@ -17,7 +17,7 @@ public static class DependencyInjection
 		services.AddDbContext<BanWhoDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("DevConnection") ??
 			throw new InvalidOperationException("connection string DevConnection not found")));
 #else
-		services.AddDbContext<BanWhoDbContext>(options => options.UseSqlServer(configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING") ??
+		services.AddDbContext<BanWhoDbContext>(options => options.UseSqlServer(Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING") ??
 			throw new InvalidOperationException("connection string AZURE_SQL_CONNECTIONSTRING not found")));
 #endif
 
