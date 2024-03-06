@@ -5,6 +5,7 @@ using BanWho.Domain.Interfaces;
 using BanWho.Infrastructure.Data;
 using Camille.Enums;
 using Camille.RiotGames.MatchV5;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace BanWho.Infrastructure.Jobs;
@@ -12,6 +13,8 @@ namespace BanWho.Infrastructure.Jobs;
 [DisallowConcurrentExecution]
 internal class UpdateChampGameStatsBackgroundJob : IJob
 {
+	private readonly ILogger<UpdateChampGameStatsBackgroundJob> _logger;
+
 	private readonly IRiotDataCrawler _riotDataCrawler;
 
 	private readonly IPlayerPuuidRepository _playerPuuidRepository;
@@ -25,13 +28,15 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 	private readonly IChampMatchupStatsRepository _champMatchupStatsRepository;
 
 	public UpdateChampGameStatsBackgroundJob
-		(IRiotDataCrawler riotDataCrawler,
+		(ILogger<UpdateChampGameStatsBackgroundJob> logger,
+		IRiotDataCrawler riotDataCrawler,
 		IPlayerPuuidRepository playerPuuidRepository,
 		IProcessedMatchesRepository processedMatchesRepository,
 		IBanWhoInfoRepository banMeInfoRepository,
 		IChampGameStatsRepository champGameStatsRepository,
 		IChampMatchupStatsRepository champMatchupStatsRepository)
 	{
+		_logger = logger;
 		_riotDataCrawler = riotDataCrawler;
 		_playerPuuidRepository = playerPuuidRepository;
 		_processedMatchesRepository = processedMatchesRepository;
@@ -42,9 +47,9 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		System.Diagnostics.Trace.WriteLine("Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 		await SeedChampGameStatsAsync();
-		System.Diagnostics.Trace.WriteLine("Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow);
 	}
 
 	public async Task SeedChampGameStatsAsync()
@@ -93,7 +98,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			unprocessedMatches += matchIDs.Count;
 		}
 
-		System.Diagnostics.Trace.WriteLine("Found " + unprocessedMatches + " unprocessed matches");
+		_logger.LogInformation("Found " + unprocessedMatches + " unprocessed matches");
 
 		// return if no new matches to process
 		if (unprocessedMatches == 0)
@@ -116,12 +121,12 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		}
 
 		// update recorded games
-		System.Diagnostics.Trace.WriteLine("Found " + matches.Count + " new matches");
+		_logger.LogInformation("Found " + matches.Count + " new matches");
 
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		System.Diagnostics.Trace.WriteLine("Updated recorded games = " + recordedGames);
+		_logger.LogInformation("Updated recorded games = " + recordedGames);
 
 		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();

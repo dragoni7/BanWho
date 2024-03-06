@@ -2,6 +2,7 @@
 using BanWho.Domain.Interfaces;
 using BanWho.Infrastructure.Data;
 using Camille.Enums;
+using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace BanWho.Infrastructure.Jobs;
@@ -9,19 +10,22 @@ namespace BanWho.Infrastructure.Jobs;
 [DisallowConcurrentExecution]
 internal class UpdatePlayersBackgroundJob : IJob
 {
+	private readonly ILogger<UpdatePlayersBackgroundJob> _logger;
+
 	private readonly IPlayerPuuidRepository _playerPuuidRepository;
 
 	private readonly IRiotDataCrawler _riotDataCrawler;
 
-	public UpdatePlayersBackgroundJob(IPlayerPuuidRepository playerPuuidRepository, IRiotDataCrawler riotDataCrawler)
+	public UpdatePlayersBackgroundJob(ILogger<UpdatePlayersBackgroundJob> logger, IPlayerPuuidRepository playerPuuidRepository, IRiotDataCrawler riotDataCrawler)
 	{
+		_logger = logger;
 		_playerPuuidRepository = playerPuuidRepository;
 		_riotDataCrawler = riotDataCrawler;
 	}
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		System.Diagnostics.Trace.WriteLine("Starting Update Players Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("Starting Update Players Background Job at " + DateTime.UtcNow);
 
 #if DEBUG
 		Tier[] selectedTiers = [Tier.EMERALD];
@@ -59,7 +63,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 			}
 		}
 
-		System.Diagnostics.Trace.WriteLine("Finished Update Players Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("Finished Update Players Background Job at " + DateTime.UtcNow);
 	}
 
 	private RegionalRoute GetRegionalRouteFromPlatform(PlatformRoute route)
