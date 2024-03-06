@@ -47,7 +47,7 @@ public static class DependencyInjection
 
 			options
 				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey)
-				.AddTrigger(trigger => trigger.StartNow())
+				.AddTrigger(trigger => trigger.ForJob(updatePlayersJobKey).StartNow())
 				.AddTrigger(trigger =>
 					trigger
 						.ForJob(updatePlayersJobKey)
