@@ -12,11 +12,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
-builder.Configuration.AddEnvironmentVariables();
-
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
+
+builder.Configuration.AddEnvironmentVariables();
 
 var app = builder.Build();
 
