@@ -10,7 +10,7 @@ namespace BanWho.Infrastructure.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            /*migrationBuilder.CreateTable(
+            migrationBuilder.CreateTable(
                 name: "AppInfo",
                 columns: table => new
                 {
@@ -72,7 +72,7 @@ namespace BanWho.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ChampMatchupStats", x => x.Id);
-                });*/
+                });
 
             migrationBuilder.CreateTable(
                 name: "PlayerPuuids",
@@ -86,7 +86,7 @@ namespace BanWho.Infrastructure.Migrations
                     table.PrimaryKey("PK_PlayerPuuids", x => x.PUUID);
                 });
 
-            /*migrationBuilder.CreateTable(
+            migrationBuilder.CreateTable(
                 name: "ProcessedMatches",
                 columns: table => new
                 {
@@ -95,7 +95,7 @@ namespace BanWho.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProcessedMatches", x => x.MatchID);
-                });*/
+                });
         }
 
         /// <inheritdoc />
