@@ -43,30 +43,18 @@ public static class DependencyInjection
 						.RepeatForever())
 						);
 #else
-			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
+
+			/*var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
 				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
-				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow())
-				.AddTrigger(trigger =>
-					trigger
-						.ForJob(updateChampStatsJobKey)
-						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(72)
-						.RepeatForever())
-						);
+				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow());*/
 
 			var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
 
 			options
 				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey)
-				.AddTrigger(trigger =>
-					trigger
-						.ForJob(updatePlayersJobKey)
-						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(168)
-						.RepeatForever())
-						);
+				.AddTrigger(trigger => trigger.ForJob(updatePlayersJobKey).StartNow());
 #endif
 		});
 
