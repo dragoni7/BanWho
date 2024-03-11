@@ -25,7 +25,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		_logger.LogInformation("Starting Update Players Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("----- Starting Update Players Background Job at " + DateTime.UtcNow + " -----");
 
 #if DEBUG
 		Tier[] selectedTiers = [Tier.EMERALD];
@@ -64,7 +64,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 			}
 		}
 
-		_logger.LogInformation("Finished Update Players Background Job at " + DateTime.UtcNow);
+		_logger.LogInformation("----- Finished Update Players Background Job at " + DateTime.UtcNow + " -----");
 	}
 
 	private RegionalRoute GetRegionalRouteFromPlatform(PlatformRoute route)

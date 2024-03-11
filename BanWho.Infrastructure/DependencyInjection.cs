@@ -30,16 +30,17 @@ public static class DependencyInjection
 		services.AddQuartz(options =>
 		{
 #if DEBUG
-			var jobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
+			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
-				.AddJob<UpdateChampGameStatsBackgroundJob>(jobKey)
+				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
+				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow())
 				.AddTrigger(trigger =>
 					trigger
-						.ForJob(jobKey)
+						.ForJob(updateChampStatsJobKey)
 						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInSeconds(5)
-						.WithRepeatCount(0))
+						schedule.WithIntervalInHours(72)
+						.RepeatForever())
 						);
 #else
 			var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
