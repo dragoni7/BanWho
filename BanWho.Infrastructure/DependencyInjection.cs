@@ -44,17 +44,17 @@ public static class DependencyInjection
 						);
 #else
 
-			/*var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
+			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
 				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
-				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow());*/
+				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow());
 
-			var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
+			/*var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
 
 			options
 				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey)
-				.AddTrigger(trigger => trigger.ForJob(updatePlayersJobKey).StartNow());
+				.AddTrigger(trigger => trigger.ForJob(updatePlayersJobKey).StartNow());*/
 #endif
 		});
 
