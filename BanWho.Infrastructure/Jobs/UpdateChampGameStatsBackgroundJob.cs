@@ -47,9 +47,9 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task Execute(IJobExecutionContext context)
 	{
-		_logger.LogInformation("----- Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow + " -----");
+		_logger.LogInformation("----- Starting Update Champ Game Stats Background Job at " + DateTime.UtcNow + " -----\n");
 		await SeedChampGameStatsAsync();
-		_logger.LogInformation("----- Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow + " -----");
+		_logger.LogInformation("----- Finished Update Champ Game Stats Background Job at " + DateTime.UtcNow + " -----\n");
 	}
 
 	public async Task SeedChampGameStatsAsync()
@@ -58,9 +58,15 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new();
 
+		int i = 0;
+
 		foreach (Player player in playerPuuids)
 		{
-			_logger.LogInformation($"UpdateChampGameStatsBackgroundJob: Processing player {player.PUUID} from region {(RegionalRoute)player.RegionalRoute}");
+			i++;
+
+			// decrease process size for demonstration
+			if (i > playerPuuids.Count / 8)
+				break;
 
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);
 
@@ -81,20 +87,18 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			}
 		}
 
-		int unprocessedMatches = 0;
-
-		foreach (var matchIDs in matchIDsToProcess.Values)
+		foreach (var pair in matchIDsToProcess)
 		{
-			unprocessedMatches += matchIDs.Count;
+			_logger.LogInformation($"Found {pair.Value.Count} unprocessed matches for {pair.Key}");
 		}
 
-		_logger.LogInformation($"UpdateChampGameStatsBackgroundJob: Found {unprocessedMatches} unprocessed matches");
-
 		// return if no new matches to process
-		if (unprocessedMatches == 0)
+		if (matchIDsToProcess.Values.Count == 0)
 			return;
 
 		HashSet<Match> matches = new();
+
+		_logger.LogInformation($"Crawling Matches...");
 
 		// get new matches
 		foreach (var matchIDSet in matchIDsToProcess)
@@ -102,6 +106,8 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			var crawledMatches = await _riotDataCrawler.CrawlMatchesAsync(matchIDSet.Value, matchIDSet.Key);
 
 			matches.UnionWith(crawledMatches);
+
+			_logger.LogInformation($"Marking {matchIDSet.Value.Count} matches as processed.");
 
 			// add new matches to processed matches
 			foreach (string matchId in matchIDSet.Value)
@@ -111,12 +117,12 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		}
 
 		// update recorded games
-		_logger.LogInformation($"UpdateChampGameStatsBackgroundJob: Found {matches.Count} new matches");
+		_logger.LogInformation($"Found {matches.Count} new matches");
 
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		_logger.LogInformation($"UpdateChampGameStatsBackgroundJob: Updated recorded games to {recordedGames}");
+		_logger.LogInformation($"Updated recorded games to {recordedGames}");
 
 		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();

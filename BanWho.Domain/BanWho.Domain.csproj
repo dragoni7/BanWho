@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2024-03-08-85cb341f01" />
+    <PackageReference Include="Camille.RiotGames" Version="3.0.0-nightly-2024-03-13-9d1e95081a" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
 

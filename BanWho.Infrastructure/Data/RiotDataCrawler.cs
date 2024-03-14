@@ -76,7 +76,9 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
     public async Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region)
     {
-        RiotGamesApi riotApi = RiotGamesApi.NewInstance(_context.AppInfo.First().ApiKey);
+        var banWhoInfo = await _context.GetBanWhoInfoAsync();
+
+		RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
 
         return await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
     }
@@ -85,7 +87,9 @@ internal class RiotDataCrawler : IRiotDataCrawler
     {
         HashSet<Match> matchSet = new();
 
-        RiotGamesApi riotApi = RiotGamesApi.NewInstance(_context.AppInfo.First().ApiKey);
+		var banWhoInfo = await _context.GetBanWhoInfoAsync();
+
+		RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
 
         foreach (string id in matchIDs)
         {
