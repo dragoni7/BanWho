@@ -5,6 +5,8 @@ using Camille.RiotGames;
 using System.Net.Http.Json;
 using Camille.RiotGames.LeagueV4;
 using BanWho.Domain.Consts;
+using BanWho.Infrastructure.Jobs;
+using Microsoft.Extensions.Logging;
 
 namespace BanWho.Infrastructure.Data;
 
@@ -12,9 +14,12 @@ internal class RiotDataCrawler : IRiotDataCrawler
 {
     private readonly BanWhoDbContext _context;
 
-    public RiotDataCrawler(BanWhoDbContext context)
+	private readonly ILogger<RiotDataCrawler> _logger;
+
+	public RiotDataCrawler(BanWhoDbContext context, ILogger<RiotDataCrawler> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<HashSet<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
@@ -99,12 +104,11 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
                 if (match != null)
                 {
-                    string[] matchPatchStr = match.Info.GameVersion.Split(".");
+					string[] matchPatchStr = match.Info.GameVersion.Split(".");
                     int matchPatchNumMajor = Convert.ToInt32(matchPatchStr[0]);
                     int matchPatchNumMinor = Convert.ToInt32(matchPatchStr[1]);
 
-                    var appInfo = await _context.GetBanWhoInfoAsync();
-                    string[] currentPatchStr = appInfo.PatchUsed.Split(".");
+                    string[] currentPatchStr = banWhoInfo.PatchUsed.Split(".");
                     int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
                     int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
 
@@ -121,7 +125,9 @@ internal class RiotDataCrawler : IRiotDataCrawler
                             fetchedPatch = json.First();
                         }
 
-                        appInfo.PatchUsed = fetchedPatch;
+						_logger.LogInformation($"Dumping database from old patch {banWhoInfo.PatchUsed} for new patch {fetchedPatch}");
+
+						banWhoInfo.PatchUsed = fetchedPatch;
 
                         await _context.DumpPatchDataAsync();
 

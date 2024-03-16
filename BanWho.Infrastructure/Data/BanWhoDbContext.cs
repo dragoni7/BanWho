@@ -31,14 +31,12 @@ public class BanWhoDbContext : DbContext
 
     public async Task DumpPatchDataAsync()
     {
-        System.Diagnostics.Debug.WriteLine("Dumping db");
-
 		await Database.ExecuteSqlRawAsync("DELETE FROM [ChampMatchupStats]");
         await ChampGameStats.ExecuteDeleteAsync();
 
         var appInfo = await GetBanWhoInfoAsync();
         appInfo.RecordedGames = 0;
 
-        SaveChanges();
+        await SaveChangesAsync();
 	}
 }
