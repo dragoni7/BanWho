@@ -1,0 +1,21 @@
+{
+  "logging": {
+    "logLevel": {
+      "default": "Information",
+      "Host.Results": "Information",
+      "Function": "Information",
+      "Host.Aggregator": "Information",
+      "Azure.Core": "Warning",
+      "Azure.Storage.Queues": "Warning",
+      "Azure.Storage.Blobs": "Warning"
+    },
+    "applicationInsights": {
+      "samplingSettings": {
+        "isEnabled": true,
+        "maxTelemetryItemsPerSecond": 20,
+        "excludedTypes": "Request;Exception"
+      },
+      "enableDependencyTracking": true
+    }
+  }
+}
