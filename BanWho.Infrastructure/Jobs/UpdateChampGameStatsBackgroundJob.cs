@@ -65,7 +65,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			i++;
 
 			// decrease process size for demonstration while waiting for production key
-			if (i > playerPuuids.Count / 20)
+			if (i > playerPuuids.Count / 18)
 				break;
 
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);

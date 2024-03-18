@@ -112,9 +112,12 @@ internal class RiotDataCrawler : IRiotDataCrawler
                     int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
                     int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
 
-                    if (matchPatchNumMajor > currentPatchMajor || matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor > currentPatchMinor)
+                    bool isPatchNew = matchPatchNumMajor > currentPatchMajor || (matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor > currentPatchMinor);
+                    bool isPatchSame = matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor == currentPatchMinor;
+
+
+					if (isPatchNew)
                     {
-                        // new patch
                         matchSet = new();
 
                         string fetchedPatch = "";
@@ -125,15 +128,24 @@ internal class RiotDataCrawler : IRiotDataCrawler
                             fetchedPatch = json.First();
                         }
 
-						_logger.LogInformation($"Dumping database from old patch {banWhoInfo.PatchUsed} for new patch {fetchedPatch}");
+						string[] latestPatchStr = fetchedPatch.Split(".");
+						int latestPatchMajor = Convert.ToInt32(latestPatchStr[0]);
+						int latestPatchMinor = Convert.ToInt32(latestPatchStr[1]);
 
-						banWhoInfo.PatchUsed = fetchedPatch;
+                        bool isPatchAhead = matchPatchNumMajor > latestPatchMajor || (matchPatchNumMajor == latestPatchMajor && matchPatchNumMinor > latestPatchMinor);
 
-                        await _context.DumpPatchDataAsync();
+                        if (!isPatchAhead)
+                        {
+							_logger.LogInformation($"Dumping database from old patch {banWhoInfo.PatchUsed} for new patch {fetchedPatch}");
 
-                        matchSet.Add(match);
+							banWhoInfo.PatchUsed = fetchedPatch;
+
+							await _context.DumpPatchDataAsync();
+
+							matchSet.Add(match);
+						}
                     }
-                    else if (matchPatchNumMajor == currentPatchMajor && matchPatchNumMinor == currentPatchMinor)
+                    else if (isPatchSame)
                     {
                         matchSet.Add(match);
                     }
