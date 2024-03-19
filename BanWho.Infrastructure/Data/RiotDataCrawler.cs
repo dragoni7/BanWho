@@ -5,7 +5,6 @@ using Camille.RiotGames;
 using System.Net.Http.Json;
 using Camille.RiotGames.LeagueV4;
 using BanWho.Domain.Consts;
-using BanWho.Infrastructure.Jobs;
 using Microsoft.Extensions.Logging;
 
 namespace BanWho.Infrastructure.Data;

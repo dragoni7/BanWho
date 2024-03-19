@@ -54,7 +54,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task SeedChampGameStatsAsync()
 	{
-		// gather match ids from players
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new();
 
@@ -65,7 +64,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			i++;
 
 			// decrease process size for demonstration while waiting for production key
-			if (i > playerPuuids.Count / 18)
+			if (i > playerPuuids.Count / 14)
 				break;
 
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);
@@ -92,7 +91,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			_logger.LogInformation($"Found {pair.Value.Count} unprocessed matches for {pair.Key}");
 		}
 
-		// return if no new matches to process
 		if (matchIDsToProcess.Values.Count == 0)
 			return;
 
@@ -100,7 +98,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		_logger.LogInformation($"Crawling Matches...");
 
-		// get new matches
 		foreach (var matchIDSet in matchIDsToProcess)
 		{
 			var crawledMatches = await _riotDataCrawler.CrawlMatchesAsync(matchIDSet.Value, matchIDSet.Key);
@@ -109,14 +106,12 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 			_logger.LogInformation($"Marking {matchIDSet.Value.Count} matches as processed.");
 
-			// add new matches to processed matches
 			foreach (string matchId in matchIDSet.Value)
 			{
 				_processedMatchesRepository.Add(new ProcessedMatch() { MatchID = matchId });
 			}
 		}
 
-		// update recorded games
 		_logger.LogInformation($"Found {matches.Count} new matches");
 
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
@@ -124,7 +119,6 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		_logger.LogInformation($"Updated recorded games to {recordedGames}");
 
-		// remove oldest processed match entries
 		_processedMatchesRepository.TrimUnusedMatches();
 
 		// get champ stats from matches
