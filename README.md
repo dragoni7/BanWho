@@ -1,4 +1,4 @@
-# <h1>BanWho?</h1>
+# [<h2>BanWho?</h2>](BanWho.info)
 
 
 BanWho? is a League of Legends champion analytics web app designed for newer or returning players. The goals of the app are as follows:
