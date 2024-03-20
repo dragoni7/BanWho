@@ -30,8 +30,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 #if DEBUG
 		Tier[] selectedTiers = [Tier.EMERALD];
 #else
-		//Tier[] selectedTiers = [Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER, Tier.CHALLENGER];
-		Tier[] selectedTiers = [Tier.EMERALD, Tier.DIAMOND];
+		Tier[] selectedTiers = [Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER, Tier.CHALLENGER];
 #endif
 
 		PlatformRoute[] selectedRoutes =

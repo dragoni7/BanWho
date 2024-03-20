@@ -57,15 +57,8 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
 		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new();
 
-		int i = 0;
-
 		foreach (Player player in playerPuuids)
 		{
-			i++;
-
-			// decrease process size for demonstration while waiting for production key
-			if (i > playerPuuids.Count / 14)
-				break;
 
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);
 
