@@ -81,7 +81,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		foreach (var pair in matchIDsToProcess)
 		{
-			_logger.LogInformation($"Found {pair.Value.Count} unprocessed matches for {pair.Key}");
+			_logger.LogInformation($"Found {pair.Value.Count} unprocessed matches for {pair.Key}\n");
 		}
 
 		if (matchIDsToProcess.Values.Count == 0)
@@ -89,7 +89,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		HashSet<Match> matches = new();
 
-		_logger.LogInformation($"Crawling Matches...");
+		_logger.LogInformation($"Crawling Matches...\n");
 
 		foreach (var matchIDSet in matchIDsToProcess)
 		{
@@ -97,7 +97,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 			matches.UnionWith(crawledMatches);
 
-			_logger.LogInformation($"Marking {matchIDSet.Value.Count} matches as processed.");
+			_logger.LogInformation($"Marking {matchIDSet.Value.Count} matches as processed.\n");
 
 			foreach (string matchId in matchIDSet.Value)
 			{
@@ -105,12 +105,12 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 			}
 		}
 
-		_logger.LogInformation($"Found {matches.Count} new matches");
+		_logger.LogInformation($"Found {matches.Count} new matches\n");
 
 		await _banMeInfoRepository.UpdateRecordedGamesAsync(matches.Count);
 		int recordedGames = await _banMeInfoRepository.GetRecordedGamesAsync();
 
-		_logger.LogInformation($"Updated recorded games to {recordedGames}");
+		_logger.LogInformation($"Updated recorded games to {recordedGames}\n");
 
 		_processedMatchesRepository.TrimUnusedMatches();
 

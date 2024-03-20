@@ -43,8 +43,12 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 		await _playerPuuidRepository.ClearAsync();
 
+		await _playerPuuidRepository.SaveAsync();
+
 		foreach (PlatformRoute route in selectedRoutes)
 		{
+			_logger.LogInformation($"Crawling players for {route}\n");
+
 			foreach (Tier tier in selectedTiers)
 			{
 				var playerPuuids = await _riotDataCrawler.CrawlPlayersAsync(tier, route);
@@ -56,7 +60,7 @@ internal class UpdatePlayersBackgroundJob : IJob
                     if ( regionalRoute == 0)
 						continue;
 
-					_playerPuuidRepository.Add(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
+					await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
 				}
 
 				await _playerPuuidRepository.SaveAsync();

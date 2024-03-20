@@ -6,7 +6,7 @@ public interface IPlayerPuuidRepository
 {
     Task<List<Player>> GetAllAsync();
 
-    void Add(Player player);
+    Task AddAsync(Player player);
 
     Task ClearAsync();
 
