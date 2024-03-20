@@ -32,7 +32,7 @@ jobs:
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: dotnet install ef
-        run: dotnet tool install -g dotnet-ef --version 8.0.1
+        run: dotnet tool install -g dotnet-ef --version 9.0.0-preview.2.24128.4
 
       - name: dotnet bundle migration
         run: dotnet ef migrations bundle --runtime linux-x64 --project BanWho.Infrastructure --startup-project BanWho.WebUI.Server -o ${{env.DOTNET_ROOT}}/myapp/migrate
