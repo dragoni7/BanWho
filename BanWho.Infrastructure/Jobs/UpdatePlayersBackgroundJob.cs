@@ -35,7 +35,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 		PlatformRoute[] selectedRoutes =
 		{
-			PlatformRoute.EUW1, PlatformRoute.EUN1, PlatformRoute.TR1, PlatformRoute.RU, // Europe
+			PlatformRoute.EUW1,PlatformRoute.EUN1, PlatformRoute.TR1, PlatformRoute.RU, // Europe
 			PlatformRoute.JP1, PlatformRoute.KR, // Asia
 			PlatformRoute.NA1, PlatformRoute.BR1, PlatformRoute.LA1, PlatformRoute.LA2, // Americas
 			PlatformRoute.OC1, PlatformRoute.PH2, PlatformRoute.SG2, PlatformRoute.TH2, PlatformRoute.TW2, PlatformRoute.VN2 // Sea
@@ -58,9 +58,17 @@ internal class UpdatePlayersBackgroundJob : IJob
                     if ( regionalRoute == 0)
 						continue;
 
-					await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
-					await _playerPuuidRepository.SaveAsync();
+					try
+					{
+						await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
+					}
+					catch (Exception ex)
+					{
+						_logger.LogError($"Exception: {ex} encountered from player with puuid {puuid}, and regional route {(PlatformRoute)regionalRoute}");
+					}
 				}
+
+				await _playerPuuidRepository.SaveAsync();
 			}
 		}
 

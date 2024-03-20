@@ -31,10 +31,4 @@ public class BanWhoDbContext : DbContext
 
         await SaveChangesAsync();
 	}
-
-    public async Task DumpPlayersAsync()
-    {
-		await Database.ExecuteSqlRawAsync("DELETE FROM [PlayerPuuids]");
-		await SaveChangesAsync();
-	}
 }
