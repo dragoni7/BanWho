@@ -19,11 +19,6 @@ public class BanWhoDbContext : DbContext
 
     public DbSet<BanWhoInfo> AppInfo { get; set; } = default!;
 
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
-
-	}
-
 	public async Task<BanWhoInfo> GetBanWhoInfoAsync()
     {
 		return await AppInfo.FirstAsync();
