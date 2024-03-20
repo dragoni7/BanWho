@@ -33,40 +33,59 @@ public static class DependencyInjection
 			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
-				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
-				.AddTrigger(trigger => trigger.ForJob(updateChampStatsJobKey).StartNow())
-				.AddTrigger(trigger =>
-					trigger
-						.ForJob(updateChampStatsJobKey)
-						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(48)
-						.RepeatForever())
-						);
+				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey, j => j
+				.WithDescription("Updates champ matchup and gamestats db from latest api data."));
+
+			options.AddTrigger(t => t
+				.WithIdentity("UpdateChampGameStatsBackgroundJob Trigger")
+				.ForJob(updateChampStatsJobKey)
+				.StartNow()
+				.WithSimpleSchedule(schedule =>
+				schedule.WithIntervalInHours(48)
+				.RepeatForever()));
+
+			/*var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
+
+			options
+				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey, j => j
+				.WithDescription("Updates global player puuids from latest api data."));
+
+			options
+				.AddTrigger(t => t
+				.WithIdentity("UpdatePlayersBackgroundJob Trigger")
+				.ForJob(updatePlayersJobKey)
+				.StartNow()
+				.WithSimpleSchedule(schedule =>
+				schedule.WithIntervalInHours(168)
+				.RepeatForever()));*/
 #else
 			var updateChampStatsJobKey = JobKey.Create(nameof(UpdateChampGameStatsBackgroundJob));
 
 			options
-				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey)
-				.AddTrigger(trigger =>
-					trigger
-						.ForJob(updateChampStatsJobKey)
-						.WithSimpleSchedule(schedule =>
-						schedule.WithIntervalInHours(48)
-						.RepeatForever())
-						);
+				.AddJob<UpdateChampGameStatsBackgroundJob>(updateChampStatsJobKey, j => j
+				.WithDescription("Updates champ matchup and gamestats db from latest api data."));
+
+			options.AddTrigger(t => t
+				.WithIdentity("UpdateChampGameStatsBackgroundJob Trigger")
+				.ForJob(updateChampStatsJobKey)
+				.WithSimpleSchedule(schedule =>
+				schedule.WithIntervalInHours(48)
+				.RepeatForever()));
 
 			var updatePlayersJobKey = JobKey.Create(nameof(UpdatePlayersBackgroundJob));
 
 			options
-				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey)
-				.AddTrigger(trigger => trigger.ForJob(updatePlayersJobKey).StartNow())
-				.AddTrigger(trigger =>
-					trigger
-					.ForJob(updatePlayersJobKey)
-					.WithSimpleSchedule(schedule =>
-					schedule.WithIntervalInHours(168)
-					.RepeatForever())
-					);
+				.AddJob<UpdatePlayersBackgroundJob>(updatePlayersJobKey, j => j
+				.WithDescription("Updates global player puuids from latest api data."));
+
+			options
+				.AddTrigger(t => t
+				.WithIdentity("UpdatePlayersBackgroundJob Trigger")
+				.ForJob(updatePlayersJobKey)
+				.StartNow()
+				.WithSimpleSchedule(schedule =>
+				schedule.WithIntervalInHours(168)
+				.RepeatForever()));
 #endif
 		});
 
