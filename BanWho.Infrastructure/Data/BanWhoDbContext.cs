@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BanWho.Infrastructure.Data;
 
-internal class BanWhoDbContext : DbContext
+public class BanWhoDbContext : DbContext
 {
     public BanWhoDbContext(DbContextOptions<BanWhoDbContext> options) : base(options)
     {
