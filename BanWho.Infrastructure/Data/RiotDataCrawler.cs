@@ -6,26 +6,31 @@ using System.Net.Http.Json;
 using Camille.RiotGames.LeagueV4;
 using BanWho.Domain.Consts;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using BanWho.Infrastructure.Data.Repositories;
 
 namespace BanWho.Infrastructure.Data;
 
 internal class RiotDataCrawler : IRiotDataCrawler
 {
-    private readonly BanWhoDbContext _context;
+    private readonly BanWhoInfoRepository _banWhoInfoRepository;
 
 	private readonly ILogger<RiotDataCrawler> _logger;
 
-	public RiotDataCrawler(BanWhoDbContext context, ILogger<RiotDataCrawler> logger)
+    private readonly IConfiguration _config;
+
+    private const string apiKeySection = "RIOTAPI_KEY";
+
+	public RiotDataCrawler(BanWhoDbContext context, BanWhoInfoRepository banWhoInfoRepository, ILogger<RiotDataCrawler> logger, IConfiguration config)
     {
-        _context = context;
-        _logger = logger;
+        _banWhoInfoRepository = banWhoInfoRepository;
+		_logger = logger;
+		_config = config;
     }
 
     public async Task<HashSet<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
     {
-        var banWhoInfo = await _context.GetBanWhoInfoAsync();
-
-        RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
+		RiotGamesApi riotApi = RiotGamesApi.NewInstance(_config.GetRequiredSection(apiKeySection).Value);
 		
         HashSet<string> puuids = new();
 
@@ -82,9 +87,7 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
     public async Task<string[]> GatherMatchIDsAsync(string playerPuuid, RegionalRoute region)
     {
-        var banWhoInfo = await _context.GetBanWhoInfoAsync();
-
-		RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
+		RiotGamesApi riotApi = RiotGamesApi.NewInstance(_config.GetRequiredSection(apiKeySection).Value);
 
         return await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
     }
@@ -93,23 +96,22 @@ internal class RiotDataCrawler : IRiotDataCrawler
     {
         HashSet<Match> matchSet = new();
 
-		var banWhoInfo = await _context.GetBanWhoInfoAsync();
-
-		RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
+		RiotGamesApi riotApi = RiotGamesApi.NewInstance(_config.GetRequiredSection(apiKeySection).Value);
 
         foreach (string id in matchIDs)
         {
             try
             {
 				Match match = await riotApi.MatchV5().GetMatchAsync(region, id);
+                string patchUsed = await _banWhoInfoRepository.GetPatchUsedAsync();
 
-                if (match != null)
+				if (match != null)
                 {
 					string[] matchPatchStr = match.Info.GameVersion.Split(".");
                     int matchPatchNumMajor = Convert.ToInt32(matchPatchStr[0]);
                     int matchPatchNumMinor = Convert.ToInt32(matchPatchStr[1]);
 
-                    string[] currentPatchStr = banWhoInfo.PatchUsed.Split(".");
+                    string[] currentPatchStr = patchUsed.Split(".");
                     int currentPatchMajor = Convert.ToInt32(currentPatchStr[0]);
                     int currentPatchMinor = Convert.ToInt32(currentPatchStr[1]);
 
@@ -137,11 +139,9 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
                         if (!isPatchAhead)
                         {
-							_logger.LogInformation($"Dumping database from old patch {banWhoInfo.PatchUsed} for new patch {fetchedPatch}");
+							_logger.LogInformation($"Dumping database from old patch {patchUsed} for new patch {fetchedPatch}");
 
-							banWhoInfo.PatchUsed = fetchedPatch;
-
-							await _context.DumpPatchDataAsync();
+                            await _banWhoInfoRepository.UpdatePatchUsedAsync(fetchedPatch);
 
 							matchSet.Add(match);
 						}

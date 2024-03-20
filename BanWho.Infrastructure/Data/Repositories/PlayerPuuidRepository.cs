@@ -20,7 +20,7 @@ internal class PlayerPuuidRepository : IPlayerPuuidRepository
 
 	public async Task ClearAsync()
 	{
-		await _context.PlayerPuuids.ExecuteDeleteAsync();
+		await _context.DumpPlayersAsync();
 	}
 
 	public int Count()

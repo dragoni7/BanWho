@@ -9,4 +9,6 @@ public interface IBanWhoInfoRepository
 	Task<string> GetAppVersionAsync();
 
 	Task<string> GetPatchUsedAsync();
+
+	Task UpdatePatchUsedAsync(string newPatch);
 }

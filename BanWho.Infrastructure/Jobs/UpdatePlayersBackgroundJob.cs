@@ -1,4 +1,4 @@
-﻿using BanWho.Domain.Entities;
+﻿ using BanWho.Domain.Entities;
 using BanWho.Domain.Interfaces;
 using BanWho.Infrastructure.Data;
 using Camille.Enums;
@@ -43,8 +43,6 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 		await _playerPuuidRepository.ClearAsync();
 
-		await _playerPuuidRepository.SaveAsync();
-
 		foreach (PlatformRoute route in selectedRoutes)
 		{
 			_logger.LogInformation($"Crawling players for {route}\n");
@@ -61,9 +59,8 @@ internal class UpdatePlayersBackgroundJob : IJob
 						continue;
 
 					await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
+					await _playerPuuidRepository.SaveAsync();
 				}
-
-				await _playerPuuidRepository.SaveAsync();
 			}
 		}
 

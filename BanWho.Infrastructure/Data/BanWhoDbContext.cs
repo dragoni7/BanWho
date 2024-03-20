@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BanWho.Infrastructure.Data;
 
-public class BanWhoDbContext : DbContext
+internal class BanWhoDbContext : DbContext
 {
     public BanWhoDbContext(DbContextOptions<BanWhoDbContext> options) : base(options)
     {
@@ -26,12 +26,15 @@ public class BanWhoDbContext : DbContext
 
     public async Task DumpPatchDataAsync()
     {
-		await Database.ExecuteSqlRawAsync("DELETE FROM [ChampMatchupStats]");
-        await ChampGameStats.ExecuteDeleteAsync();
-
-        var appInfo = await GetBanWhoInfoAsync();
-        appInfo.RecordedGames = 0;
+        await ChampMatchupStats.ExecuteDeleteAsync();
+		await ChampGameStats.ExecuteDeleteAsync();
 
         await SaveChangesAsync();
+	}
+
+    public async Task DumpPlayersAsync()
+    {
+		await Database.ExecuteSqlRawAsync("DELETE FROM [PlayerPuuids]");
+		await SaveChangesAsync();
 	}
 }
