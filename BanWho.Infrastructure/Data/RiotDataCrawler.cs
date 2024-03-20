@@ -23,7 +23,9 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
     public async Task<HashSet<string>> CrawlPlayersAsync(Tier tier, PlatformRoute region)
     {
-        RiotGamesApi riotApi = RiotGamesApi.NewInstance(_context.AppInfo.First().ApiKey);
+        var banWhoInfo = await _context.GetBanWhoInfoAsync();
+
+        RiotGamesApi riotApi = RiotGamesApi.NewInstance(banWhoInfo.ApiKey);
 		
         HashSet<string> puuids = new();
 
