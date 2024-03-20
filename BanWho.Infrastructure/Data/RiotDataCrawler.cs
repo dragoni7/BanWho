@@ -7,13 +7,13 @@ using Camille.RiotGames.LeagueV4;
 using BanWho.Domain.Consts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using BanWho.Infrastructure.Data.Repositories;
+using BanWho.Domain.Interfaces;
 
 namespace BanWho.Infrastructure.Data;
 
 internal class RiotDataCrawler : IRiotDataCrawler
 {
-    private readonly BanWhoInfoRepository _banWhoInfoRepository;
+    private readonly IBanWhoInfoRepository _banWhoInfoRepository;
 
 	private readonly ILogger<RiotDataCrawler> _logger;
 
@@ -21,7 +21,7 @@ internal class RiotDataCrawler : IRiotDataCrawler
 
     private const string apiKeySection = "RIOTAPI_KEY";
 
-	public RiotDataCrawler(BanWhoDbContext context, BanWhoInfoRepository banWhoInfoRepository, ILogger<RiotDataCrawler> logger, IConfiguration config)
+	public RiotDataCrawler(BanWhoDbContext context, IBanWhoInfoRepository banWhoInfoRepository, ILogger<RiotDataCrawler> logger, IConfiguration config)
     {
         _banWhoInfoRepository = banWhoInfoRepository;
 		_logger = logger;
