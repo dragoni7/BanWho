@@ -13,9 +13,9 @@ internal class PlayerPuuidRepository : IPlayerPuuidRepository
 		_context = context;
 	}
 
-	public async Task<Player> GetPlayerAsync(string puuid)
+	public async Task<bool> ContainsPlayerAsync(string puuid)
 	{
-		return await _context.PlayerPuuids.FirstOrDefaultAsync(p => p.PUUID == puuid);
+		return await _context.PlayerPuuids.AsNoTracking().AnyAsync(p => p.PUUID == puuid);
 	}
 
 	public async Task AddAsync(Player player)
@@ -26,7 +26,6 @@ internal class PlayerPuuidRepository : IPlayerPuuidRepository
 	public async Task ClearAsync()
 	{
 		await _context.PlayerPuuids.ExecuteDeleteAsync();
-		_context.ChangeTracker.Clear();
 	}
 
 	public int Count()

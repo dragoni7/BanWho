@@ -28,7 +28,7 @@ internal class UpdatePlayersBackgroundJob : IJob
 		_logger.LogInformation("----- Starting Update Players Background Job at " + DateTime.UtcNow + " -----\n");
 
 #if DEBUG
-		Tier[] selectedTiers = [Tier.EMERALD];
+		Tier[] selectedTiers = [Tier.GRANDMASTER];
 #else
 		Tier[] selectedTiers = [Tier.EMERALD, Tier.DIAMOND, Tier.MASTER, Tier.GRANDMASTER, Tier.CHALLENGER];
 #endif
@@ -60,15 +60,19 @@ internal class UpdatePlayersBackgroundJob : IJob
 
 					try
 					{
-						await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
+						bool containsPlayer = await _playerPuuidRepository.ContainsPlayerAsync(puuid);
+
+						if (!containsPlayer)
+						{
+							await _playerPuuidRepository.AddAsync(new Player { PUUID = puuid, RegionalRoute = regionalRoute });
+							await _playerPuuidRepository.SaveAsync();
+						}
 					}
 					catch (Exception ex)
 					{
 						_logger.LogError($"Exception: {ex} encountered from player with puuid {puuid}, and regional route {(PlatformRoute)regionalRoute}");
 					}
 				}
-
-				await _playerPuuidRepository.SaveAsync();
 			}
 		}
 

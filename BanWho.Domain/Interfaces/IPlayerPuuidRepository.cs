@@ -6,7 +6,7 @@ public interface IPlayerPuuidRepository
 {
     Task<List<Player>> GetAllAsync();
 
-    Task<Player> GetPlayerAsync(string puuid);
+    Task<bool> ContainsPlayerAsync(string puuid);
 
     Task AddAsync(Player player);
 
