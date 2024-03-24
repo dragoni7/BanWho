@@ -57,7 +57,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 	public async Task SeedChampGameStatsAsync()
 	{
 		Player[] allPlayers = await _playerPuuidRepository.GetAllAsync();
-		Player[] playerPuuids = Random.Shared.GetItems(allPlayers, allPlayers.Length / 2);
+		Player[] playerPuuids = Random.Shared.GetItems(allPlayers, allPlayers.Length / 4);
 
 		_logger.LogInformation($"Using sample of {playerPuuids.Length} players");
 
