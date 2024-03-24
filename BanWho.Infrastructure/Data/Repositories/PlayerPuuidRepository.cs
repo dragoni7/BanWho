@@ -33,9 +33,9 @@ internal class PlayerPuuidRepository : IPlayerPuuidRepository
 		return _context.PlayerPuuids.Count();
 	}
 
-	public async Task<List<Player>> GetAllAsync()
+	public async Task<Player[]> GetAllAsync()
 	{
-		return await _context.PlayerPuuids.ToListAsync();
+		return await _context.PlayerPuuids.ToArrayAsync();
 	}
 
 	public async Task SaveAsync()

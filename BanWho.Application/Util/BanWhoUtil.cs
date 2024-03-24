@@ -1,6 +1,6 @@
 ﻿namespace BanWho.Application.Util;
 
-public static class MathUtil
+public static class BanWhoUtil
 {
 	public static float AsPercentageOf(float n1, float n2)
 	{

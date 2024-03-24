@@ -1,4 +1,6 @@
-﻿using BanWho.Application.Util;
+﻿using System.Runtime;
+using System.Runtime.InteropServices;
+using BanWho.Application.Util;
 using BanWho.Domain.Consts;
 using BanWho.Domain.Entities;
 using BanWho.Domain.Interfaces;
@@ -54,18 +56,16 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 	public async Task SeedChampGameStatsAsync()
 	{
-		List<Player> playerPuuids = await _playerPuuidRepository.GetAllAsync();
-		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new();
+		Player[] allPlayers = await _playerPuuidRepository.GetAllAsync();
+		Player[] playerPuuids = Random.Shared.GetItems(allPlayers, allPlayers.Length / 2);
+
+		_logger.LogInformation($"Using sample of {playerPuuids.Length} players");
+
+		Dictionary<RegionalRoute, HashSet<string>> matchIDsToProcess = new() { { RegionalRoute.EUROPE, new() }, { RegionalRoute.ASIA, new() }, { RegionalRoute.AMERICAS, new() }, { RegionalRoute.SEA, new() } };
 
 		foreach (Player player in playerPuuids)
 		{
-
 			var playerMatchIDs = await _riotDataCrawler.GatherMatchIDsAsync(player.PUUID, (RegionalRoute)player.RegionalRoute);
-
-			if (!matchIDsToProcess.ContainsKey((RegionalRoute)player.RegionalRoute))
-			{
-				matchIDsToProcess.Add((RegionalRoute)player.RegionalRoute, new());
-			}
 
 			var newMatchIDs = playerMatchIDs.Where(id => !_processedMatchesRepository.ContainsMatchId(id));
 
@@ -166,22 +166,22 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 		entry.SuppPicks += stats.RoleStats[LeagueConsts.Roles.SUPPORT].Picks;
 		entry.Bans += stats.Bans;
 
-		entry.TopWinRate = MathUtil.AsPercentageOf(entry.TopWins, entry.TopPicks);
-		entry.TopPickRate = MathUtil.AsPercentageOf(entry.TopPicks, recordedGames);
+		entry.TopWinRate = BanWhoUtil.AsPercentageOf(entry.TopWins, entry.TopPicks);
+		entry.TopPickRate = BanWhoUtil.AsPercentageOf(entry.TopPicks, recordedGames);
 
-		entry.MidWinRate = MathUtil.AsPercentageOf(entry.MidWins, entry.MidPicks);
-		entry.MidPickRate = MathUtil.AsPercentageOf(entry.MidPicks, recordedGames);
+		entry.MidWinRate = BanWhoUtil.AsPercentageOf(entry.MidWins, entry.MidPicks);
+		entry.MidPickRate = BanWhoUtil.AsPercentageOf(entry.MidPicks, recordedGames);
 
-		entry.JungleWinRate = MathUtil.AsPercentageOf(entry.JungleWins, entry.JunglePicks);
-		entry.JunglePickRate = MathUtil.AsPercentageOf(entry.JunglePicks, recordedGames);
+		entry.JungleWinRate = BanWhoUtil.AsPercentageOf(entry.JungleWins, entry.JunglePicks);
+		entry.JunglePickRate = BanWhoUtil.AsPercentageOf(entry.JunglePicks, recordedGames);
 
-		entry.BotWinRate = MathUtil.AsPercentageOf(entry.BotWins, entry.BotPicks);
-		entry.BotPickRate = MathUtil.AsPercentageOf(entry.BotPicks, recordedGames);
+		entry.BotWinRate = BanWhoUtil.AsPercentageOf(entry.BotWins, entry.BotPicks);
+		entry.BotPickRate = BanWhoUtil.AsPercentageOf(entry.BotPicks, recordedGames);
 
-		entry.SuppWinRate = MathUtil.AsPercentageOf(entry.SuppWins, entry.SuppPicks);
-		entry.SuppPickRate = MathUtil.AsPercentageOf(entry.SuppPicks, recordedGames);
+		entry.SuppWinRate = BanWhoUtil.AsPercentageOf(entry.SuppWins, entry.SuppPicks);
+		entry.SuppPickRate = BanWhoUtil.AsPercentageOf(entry.SuppPicks, recordedGames);
 
-		entry.BanRate = MathUtil.AsPercentageOf(entry.Bans, recordedGames);
+		entry.BanRate = BanWhoUtil.AsPercentageOf(entry.Bans, recordedGames);
 	}
 
 	private async Task UpdateChampMatchupStatsAsync(ChampGameStats entry, Dictionary<Champion, WinStats> matchupStats)
@@ -199,7 +199,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 					EnemyChampion = matchup.Key.ToString(),
 					Wins = matchup.Value.Wins,
 					Picks = matchup.Value.Picks,
-					WinRate = MathUtil.AsPercentageOf(matchup.Value.Wins, matchup.Value.Picks),
+					WinRate = BanWhoUtil.AsPercentageOf(matchup.Value.Wins, matchup.Value.Picks),
 					ChampionName = entry.ChampionName
 				});
 			}
@@ -207,7 +207,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
             {
 				m.Wins += matchup.Value.Wins;
 				m.Picks += matchup.Value.Picks;
-				m.WinRate = MathUtil.AsPercentageOf(m.Wins, m.Picks);
+				m.WinRate = BanWhoUtil.AsPercentageOf(m.Wins, m.Picks);
             }
 
 			await _champMatchupStatsRepository.SaveAsync();

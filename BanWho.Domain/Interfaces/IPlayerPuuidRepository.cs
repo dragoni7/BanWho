@@ -4,7 +4,7 @@ namespace BanWho.Domain.Interfaces;
 
 public interface IPlayerPuuidRepository
 {
-    Task<List<Player>> GetAllAsync();
+    Task<Player[]> GetAllAsync();
 
     Task<bool> ContainsPlayerAsync(string puuid);
 
