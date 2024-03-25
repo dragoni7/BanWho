@@ -16,5 +16,7 @@ public class BanWhoConsts
 		public const int DataAmountToDisplay = 10;
 
 		public const int MatchesTrackedPerPlayer = 20;
+
+		public const int PlayerSampleSizeDivisor = 20;
 	}
 }
