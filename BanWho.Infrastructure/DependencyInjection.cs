@@ -69,7 +69,7 @@ public static class DependencyInjection
 				//.StartAt(DateTime.Now.AddDays(1))
 				.StartNow()
 				.WithSimpleSchedule(schedule =>
-				schedule.WithIntervalInHours(6)
+				schedule.WithIntervalInHours(3)
 				.RepeatForever()));
 
 			/*var updatePlayersJobKey = new JobKey(nameof(UpdatePlayersBackgroundJob));
