@@ -1,4 +1,10 @@
-﻿.aurelionsol {
+﻿@media (max-width: 1000px) {
+    .aurelionsol {
+        display:none
+    }
+}
+
+.aurelionsol {
     background-image: url('Assets/legend_fullscreen_aurelionsol_2048.png');
     background-size: contain;
     width: 1000px;

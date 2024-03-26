@@ -66,13 +66,12 @@ public static class DependencyInjection
 			options.AddTrigger(t => t
 				.WithIdentity("UpdateChampGameStatsBackgroundJob-Trigger")
 				.ForJob(updateChampStatsJobKey)
-				//.StartAt(DateTime.Now.AddDays(1))
 				.StartNow()
 				.WithSimpleSchedule(schedule =>
 				schedule.WithIntervalInHours(1)
 				.RepeatForever()));
 
-			/*var updatePlayersJobKey = new JobKey(nameof(UpdatePlayersBackgroundJob));
+			var updatePlayersJobKey = new JobKey(nameof(UpdatePlayersBackgroundJob));
 			options
 				.AddJob<UpdatePlayersBackgroundJob>(j => j
 				.WithIdentity(updatePlayersJobKey)
@@ -81,10 +80,10 @@ public static class DependencyInjection
 				.AddTrigger(t => t
 				.WithIdentity("UpdatePlayersBackgroundJob-Trigger")
 				.ForJob(updatePlayersJobKey)
-				.StartNow()
+				.StartAt(DateTime.Now.AddDays(7))
 				.WithSimpleSchedule(schedule =>
 				schedule.WithIntervalInHours(168)
-				.RepeatForever()));*/
+				.RepeatForever()));
 #endif
 		});
 

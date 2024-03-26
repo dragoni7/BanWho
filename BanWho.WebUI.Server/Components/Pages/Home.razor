@@ -87,7 +87,7 @@
 			<MudText Typo="Typo.h5">Recommended Bans</MudText>
 		</MudItem>
 
-		<MudDataGrid Items="@_roleBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
+		<MudDataGrid Items="@_roleBans" Outlined="true" Filterable="false" SortMode="@SortMode.Single" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
 			<Columns>
 				<TemplateColumn Title="Champion">
 					<CellTemplate>
@@ -149,7 +149,7 @@
 			</MudGrid>
 		</MudItem>
 
-		<MudDataGrid Items="@_matchupBans" Outlined="true" Filterable="false" SortMode="@SortMode.None" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
+		<MudDataGrid Items="@_matchupBans" Outlined="true" Filterable="false" SortMode="@SortMode.Single" Groupable="false" Elevation="10" Dense="true" Style="background-color:rgb(35, 44, 77)">
 			<Columns>
 				<TemplateColumn Title="Champion">
 					<CellTemplate>

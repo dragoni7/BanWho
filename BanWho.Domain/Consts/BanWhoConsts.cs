@@ -4,7 +4,7 @@ public class BanWhoConsts
 {
 	public static class StatThresholds
 	{
-		public const float MinWinRate = 49f;
+		public const float MinWinRate = 49.9f;
 
 		public const float MaxWinRate = 100f;
 
@@ -17,6 +17,6 @@ public class BanWhoConsts
 
 		public const int MatchesTrackedPerPlayer = 20;
 
-		public const int PlayerSampleSizeDivisor = 400;
+		public const float PlayerSampleSizeRatio = 0.002f;
 	}
 }
