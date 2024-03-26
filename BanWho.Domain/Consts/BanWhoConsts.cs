@@ -17,6 +17,6 @@ public class BanWhoConsts
 
 		public const int MatchesTrackedPerPlayer = 20;
 
-		public const int PlayerSampleSizeDivisor = 200;
+		public const int PlayerSampleSizeDivisor = 260;
 	}
 }
