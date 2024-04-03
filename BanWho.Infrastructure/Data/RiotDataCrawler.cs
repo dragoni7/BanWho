@@ -69,7 +69,7 @@ internal class RiotDataCrawler : IRiotDataCrawler
 					for (int i = 1; i < lowDivision; i++)
 					{
 						var entries = await riotApi.LeagueV4().GetLeagueEntriesAsync(region, QueueType.RANKED_SOLO_5x5, tier, (Division)i);
-						tierEntries.UnionWith(entries.Where(e => e.Inactive == false));
+						tierEntries.UnionWith(entries.Where(e => e.Inactive == false && e.QueueType == QueueType.RANKED_SOLO_5x5));
 					}
 
 					foreach (LeagueEntry entry in tierEntries)
@@ -89,7 +89,7 @@ internal class RiotDataCrawler : IRiotDataCrawler
     {
 		RiotGamesApi riotApi = RiotGamesApi.NewInstance(_config.GetRequiredSection(apiKeySection).Value);
 
-        return await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid);
+        return await riotApi.MatchV5().GetMatchIdsByPUUIDAsync(region, playerPuuid, queue:Queue.SUMMONERS_RIFT_5V5_RANKED_SOLO);
     }
 
     public async Task<HashSet<Match>> CrawlMatchesAsync(HashSet<string> matchIDs, RegionalRoute region)
@@ -245,7 +245,6 @@ internal class RiotDataCrawler : IRiotDataCrawler
 		foreach (LeagueItem entry in list.Entries.Where(e => e.Inactive == false))
 		{
 			var summoner = await riotApi.SummonerV4().GetBySummonerIdAsync(platformRoute, entry.SummonerId);
-			puuids.Add(summoner.Puuid);
 		}
 
         return puuids;
