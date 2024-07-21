@@ -1,4 +1,4 @@
-# [<h2>BanWho?</h2>](BanWho.info)
+# [<h2>BanWho?</h2>](https://banwho.info/)
 
 
 BanWho? is a League of Legends champion analytics web app designed for newer or returning players. The goals of the app are as follows:
@@ -12,4 +12,4 @@ The intention is to provide the targeted users with a starting point on which ch
 
 Developed with .NET 8 Blazor, Quartz, MediatR, [Camille](https://github.com/MingweiSamuel/Camille), EFC, and MudBlazor.
 
-Hosted with Azure at [BanWho?](BanWho.info)
+Hosted with Azure at [BanWho?](https://banwho.info/)
