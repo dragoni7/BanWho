@@ -23,7 +23,7 @@ namespace BanWho.Infrastructure.Data.Repositories
 			_context.ProcessedMatches.Add(match);
 		}
 
-		public async void TrimUnusedMatches()
+		public async Task TrimUnusedMatches()
 		{
 			var playerPuuids = _context.PlayerPuuids;
 			var processedMatches = _context.ProcessedMatches;

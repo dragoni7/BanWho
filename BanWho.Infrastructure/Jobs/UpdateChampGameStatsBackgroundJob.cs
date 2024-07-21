@@ -110,7 +110,7 @@ internal class UpdateChampGameStatsBackgroundJob : IJob
 
 		_logger.LogInformation($"Updated recorded games to {recordedGames}\n");
 
-		_processedMatchesRepository.TrimUnusedMatches();
+		await _processedMatchesRepository.TrimUnusedMatches();
 
 		// get champ stats from matches
 		Dictionary<Champion, FlatChampStats> champData = _riotDataCrawler.GatherChampData(_riotDataCrawler.GatherMatchData(matches));

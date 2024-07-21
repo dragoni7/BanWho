@@ -6,7 +6,7 @@ public interface IProcessedMatchesRepository
 {
 	void Add(ProcessedMatch match);
 
-	public void TrimUnusedMatches();
+	public Task TrimUnusedMatches();
 
 	bool ContainsMatchId(string id);
 
