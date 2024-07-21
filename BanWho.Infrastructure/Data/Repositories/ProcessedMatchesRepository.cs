@@ -27,7 +27,8 @@ namespace BanWho.Infrastructure.Data.Repositories
 			if (processedMatches.Count() > playerPuuids.Count() * BanWhoConsts.DataThresholds.MatchesTrackedPerPlayer)
 			{
 				int toRemove = playerPuuids.Count() - playerPuuids.Count() * BanWhoConsts.DataThresholds.MatchesTrackedPerPlayer;
-				processedMatches.RemoveRange(processedMatches.Skip(playerPuuids.Count() - toRemove));
+				int totalMatches = await processedMatches.CountAsync();
+				processedMatches.RemoveRange(processedMatches.Skip(totalMatches - toRemove));
 			}
 		}
 
