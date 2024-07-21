@@ -38,8 +38,8 @@ public static class DependencyInjection
 			options.AddTrigger(t => t
 				.WithIdentity("UpdateChampGameStatsBackgroundJob-Trigger")
 				.ForJob(updateChampStatsJobKey)
-				//.StartNow()
-				.StartAt(DateTime.Now.AddDays(1))
+				.StartNow()
+				//.StartAt(DateTime.Now.AddDays(1))
 				.WithSimpleSchedule(schedule =>
 				schedule.WithIntervalInHours(72)
 				.RepeatForever()));

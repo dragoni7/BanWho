@@ -1,6 +1,7 @@
 ﻿using BanWho.Domain.Consts;
 using BanWho.Domain.Entities;
 using BanWho.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace BanWho.Infrastructure.Data.Repositories
 {
@@ -18,7 +19,7 @@ namespace BanWho.Infrastructure.Data.Repositories
 			_context.ProcessedMatches.Add(match);
 		}
 
-		public void TrimUnusedMatches()
+		public async void TrimUnusedMatches()
 		{
 			var playerPuuids = _context.PlayerPuuids;
 			var processedMatches = _context.ProcessedMatches;
@@ -26,7 +27,8 @@ namespace BanWho.Infrastructure.Data.Repositories
 			if (processedMatches.Count() > playerPuuids.Count() * BanWhoConsts.DataThresholds.MatchesTrackedPerPlayer)
 			{
 				int toRemove = playerPuuids.Count() - playerPuuids.Count() * BanWhoConsts.DataThresholds.MatchesTrackedPerPlayer;
-				processedMatches.RemoveRange(processedMatches.TakeLast(toRemove));
+				var toTrim = await processedMatches.TakeLast(toRemove).ToListAsync();
+				processedMatches.RemoveRange(toTrim);
 			}
 		}
 

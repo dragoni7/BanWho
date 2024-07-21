@@ -1,6 +1,4 @@
-﻿using System.Runtime;
-using System.Runtime.InteropServices;
-using BanWho.Application.Util;
+﻿using BanWho.Application.Util;
 using BanWho.Domain.Consts;
 using BanWho.Domain.Entities;
 using BanWho.Domain.Interfaces;
